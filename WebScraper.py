@@ -31,6 +31,7 @@ class PlayerStats():
         self.vorp = z
         self.fg_add = 'N/A'
         self.ts_add = 'N/A'
+        self.scoring = -999999999999999999999999999999999999999
 
 url = "https://www.basketball-reference.com/leagues/NBA_2024_advanced.html"
 page = urlopen(url)
@@ -89,6 +90,20 @@ max = None
 max_stat = 0
 count = 0
 total = 0
+countDict = {}
+for p in players:
+    if (p.name in countDict):
+        countDict[p.name] +=1
+    else:
+        countDict[p.name] = 1
+for c in countDict:
+    if (countDict[c] > 1):
+        for p in players:
+            if (p.name == c and p.team != 'TOT'):
+                players.remove(p)
+        for p in players:
+            if (p.name == c and p.team != 'TOT'):
+                players.remove(p)
 for p in players:
     if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
         continue
@@ -99,19 +114,42 @@ for p in players:
 offset = -1 * total / count
 count = 0
 total = 0
+
+def mergeSort(arr):
+    if (len(arr) > 1):
+        mid = int(len(arr) / 2)
+        a = mergeSort(arr[:mid])
+        b = mergeSort(arr[mid:])
+        aPointer = 0
+        bPointer = 0
+        fin = []
+        for i in range(0, len(arr)):
+            if (aPointer >= len(a)):
+                fin.append(b[bPointer])
+                bPointer+=1
+            elif (bPointer >= len(b)):
+                fin.append(a[aPointer])
+                aPointer+=1
+            elif(a[aPointer].scoring > b[bPointer].scoring):
+                fin.append(a[aPointer])
+                aPointer+=1
+            else:
+                fin.append(b[bPointer])
+                bPointer +=1
+        return fin
+    else:
+        return arr
+
 for p in players:
     if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
         continue
     curr_stat = (0.5 * float(p.ts_add)) + float(p.fg_add)
     curr_stat /= int(p.games_played)
     curr_stat += offset
-    count+=1
-    total+= curr_stat
-    if (max == None or curr_stat > max_stat):
-        max_stat = curr_stat
-        max = p
-print(max.id + ' ' + max.name + ' ' + max.team + ' ' + max.ts_add + ' ' + max.fg_add + ' ' + str(max_stat))
-print(total / count)
+    p.scoring = curr_stat
+sortedScoring = mergeSort(players)
+for p in sortedScoring:
+    print(p.id + ' '+ p.name + ' ' + p.team + ' ' + str(p.scoring))
     
 
 
