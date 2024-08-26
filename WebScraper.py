@@ -138,7 +138,7 @@ def mergeSort(arr):
 for p in players:
     if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
         continue
-    curr_stat = float(p.fg_add)
+    curr_stat = float(p.ts_add) + (.25 * (int(p.field_goals_attempted) + (.44 * int(p.free_throws_attempted)))) + 1 * float(p.fg_add)
     curr_stat /= int(p.games_played)
     count+=1
     total+= curr_stat
@@ -150,7 +150,7 @@ total = 0
 for p in players:
     if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
         continue
-    curr_stat = float(p.fg_add) + (.25 * (int(p.field_goals_attempted) + (.44 * int(p.free_throws_attempted))))
+    curr_stat = float(p.ts_add) + (.25 * (int(p.field_goals_attempted) + (.44 * int(p.free_throws_attempted)))) + 1 * float(p.fg_add)
     curr_stat /= int(p.games_played)
     curr_stat += offset
     p.scoring = curr_stat
