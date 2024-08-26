@@ -134,12 +134,15 @@ def mergeSort(arr):
     else:
         return arr
 
+def calcScoring(p):
+    curr_stat = float(p.ts_add) + (.25 * (int(p.field_goals_attempted) + (.5 * int(p.free_throws_attempted)))) + 0.5 * float(p.fg_add)
+    curr_stat /= int(p.games_played)
+    return curr_stat
 
 for p in players:
     if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
         continue
-    curr_stat = float(p.ts_add) + (.25 * (int(p.field_goals_attempted) + (.44 * int(p.free_throws_attempted)))) + 1 * float(p.fg_add)
-    curr_stat /= int(p.games_played)
+    curr_stat = calcScoring(p)
     count+=1
     total+= curr_stat
 offset = -1 * total / count
@@ -150,12 +153,12 @@ total = 0
 for p in players:
     if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
         continue
-    curr_stat = float(p.ts_add) + (.25 * (int(p.field_goals_attempted) + (.44 * int(p.free_throws_attempted)))) + 1 * float(p.fg_add)
-    curr_stat /= int(p.games_played)
+    curr_stat = calcScoring(p)
     curr_stat += offset
     p.scoring = curr_stat
 sortedScoring = mergeSort(players)
-for p in sortedScoring:
+for i in range(0, 10):
+    p = sortedScoring[i]
     print(p.id + ' '+ p.name + ' ' + p.team + ' ' + str(p.scoring))
     
 
