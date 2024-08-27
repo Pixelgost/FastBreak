@@ -531,6 +531,6 @@ class Performer():
 ###Performer.trainForEpochs(10)
 p = Performer("2024")
 p.performModelNoUpdate()
-for i in range(1994, 2024):
+for i in range(2001, 2024):
     statHandler.saveData(str(i))
 
