@@ -88,21 +88,6 @@ class PlayerStats():
         self.rebounding = curr_stat
         return curr_stat
 
-    def calcDefense(self, offset, avg_blocks, avg_steals, avg_fouls, avg_win_share, avg_srate, avg_brate):
-        if (self.defensive_plus_minus == 'N/A' or self.defensive_win_shares == 'N/A'):
-            return None
-        block_num = (float(self.block_rate) / avg_brate) + (int(self.blocks) / avg_blocks)
-        steals_num = (float(self.steal_rate) / avg_srate) + (int(self.steals) / avg_steals)
-        fouls_num = int(self.personal_fouls) / avg_fouls
-        if(fouls_num < 1):
-            fouls_num = 1
-        box_defense = (block_num + steals_num) / (fouls_num)
-
-        advanced_defense = float(self.defensive_plus_minus) * int(self.games_played) / 10
-        curr_stat = box_defense + advanced_defense - offset
-        self.defense = curr_stat
-        return curr_stat
-
     def calcVorp(self):
         if(self.defensive_win_share_normalized != None):
             self.vorp = (.5 * self.rebounding) + (2.5 * self.scoring) + self.playmaking + (2 * self.defensive_win_share_normalized)
@@ -208,7 +193,7 @@ class statHandler():
 
 
 
-    def calculateTopScorers(self):
+    def calculateTopScorers(self, pr):
         ts_add_arr = []
         for p in self.players:
             if(p.ts_add != 'N/A'):
@@ -234,12 +219,13 @@ class statHandler():
         max_val = self.players[0].scoring
         for p in self.players:
             p.scoring /= max_val
-        print("TOP 10 SCORERS")
-        for i in range(0, 10):
-            p = self.players[i]
-            print(p.id, p.name, p.team, str(p.scoring))
+        if(pr):
+            print("TOP 10 SCORERS")
+            for i in range(0, 10):
+                p = self.players[i]
+                print(p.id, p.name, p.team, str(p.scoring))
 
-    def calculateTopPlayMakers(self):
+    def calculateTopPlayMakers(self, pr):
         rates_arr = []
         for p in self.players:
             if(p.assist_rate == 'N/A' or p.turnover_rate == 'N/A' or p.usage_percentage == 'N/A'):
@@ -263,58 +249,17 @@ class statHandler():
             p.calcPlaymaking()
             
         self.players.sort(key=lambda x: x.playmaking, reverse=True)
-        print()
         max_val = self.players[0].playmaking
         for p in self.players:
             p.playmaking /= max_val
-        print("TOP 10 PLAYMAKERS")
-        for i in range(0, 10):
-            p = self.players[i]
-            print(p.id, p.name, p.team, str(p.playmaking))
+        if(pr):
+            print()
+            print("TOP 10 PLAYMAKERS")
+            for i in range(0, 10):
+                p = self.players[i]
+                print(p.id, p.name, p.team, str(p.playmaking))
 
-    def calculateTopDefenders(self):
-        count = 0
-        total = 0
-        total_blocks, total_steals, total_fouls, total_shares, total_brate, total_srate = 0, 0, 0, 0, 0, 0
-        for p in self.players:
-            total_blocks += int(p.blocks)
-            total_fouls += int(p.personal_fouls)
-            total_steals += int(p.steals)
-            if (p.defensive_win_shares != 'N/A' and p.defensive_plus_minus != 'N/A' and p.steal_rate != 'N/A' and p.block_rate != 'N/A') :
-                count+=1
-                total_shares += float(p.defensive_win_shares)
-                total_srate += float(p.steal_rate)
-                total_brate += float(p.block_rate)
-
-        total_blocks /= len(self.players)
-        total_fouls /= len(self.players)
-        total_steals /= len(self.players)
-        total_brate /= count
-        total_srate /= count
-        total_shares /= count
-
-        count = 0
-        for p in self.players:
-            score = p.calcDefense(0, total_blocks, total_steals,total_fouls, total_shares, total_srate, total_brate)
-            if (score != None):
-                count+=1
-                total+= score
-        for p in self.players:
-            p.calcDefense(-1 * total/count, total_blocks, total_steals,total_fouls, total_shares, total_srate, total_brate)
-            
-
-
-        self.players.sort(key=lambda x: x.defense, reverse=True)
-        max_val = self.players[0].defense
-        for p in self.players:
-            p.defense /= max_val
-        print()
-        print("TOP 10 DEFENDERS")
-        for i in range(0, 10):
-            p = self.players[i]
-            print(p.id, p.name, p.team, str(p.defense))
-
-    def calculateTopRebounders(self):
+    def calculateTopRebounders(self, pr):
         reb_rates = []
         for p in self.players:
             if (p.rebound_rate == 'N/A'):
@@ -343,18 +288,17 @@ class statHandler():
         max_val = self.players[0].rebounding
         for p in self.players:
             p.rebounding /= max_val
-
-        print()
-        print("TOP 10 REBOUNDERS")
-        for i in range(0, 10):
-            p = self.players[i]
-            print(p.id, p.name, p.team, str(p.rebounding))
-    def calculateTopPlayers(self):
+        if(pr):
+            print()
+            print("TOP 10 REBOUNDERS")
+            for i in range(0, 10):
+                p = self.players[i]
+                print(p.id, p.name, p.team, str(p.rebounding))
+    def calculateTopPlayers(self, pr):
         self.getStats()
-        self.calculateTopScorers()
-        self.calculateTopDefenders()
-        self.calculateTopPlayMakers()
-        self.calculateTopRebounders()
+        self.calculateTopScorers(pr)
+        self.calculateTopPlayMakers(pr)
+        self.calculateTopRebounders(pr)
         self.players.sort(key=lambda x: x.defensive_win_shares, reverse=True)
         max_val = None
         for p in self.players:
@@ -368,13 +312,14 @@ class statHandler():
             p.calcVorp()
 
         self.players.sort(key=lambda x: x.vorp, reverse=True)
-
-        print()
-        print("TOP 10 PLAYERS")
-        for i in range(0, 10):
-            p = self.players[i]
-            print(p.id, p.name, p.team, str(p.vorp))
+        if(pr):
+            print()
+            print("TOP 10 PLAYERS")
+            for i in range(0, 10):
+                p = self.players[i]
+                print(p.id, p.name, p.team, str(p.vorp))
         return self.players
+
     def saveData(year):
         response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_advanced.html")
         html_content = response.read()
@@ -496,13 +441,15 @@ class Performer():
 
     def performModel(self):
         s = statHandler(self.year)
-        players = s.calculateTopPlayers()
+        players = s.calculateTopPlayers(False)
         # Instantiate the model
         model = SimpleNN()
 
         # Define loss function and optimizer
         criterion = nn.MSELoss()  # For classification problems
         optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+        #load trained model
         checkpoint = torch.load('model.pth')
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
@@ -520,34 +467,32 @@ class Performer():
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
                 example_input[a] = self.nba_team_arrs[a]
-        print('RESULTS: ', self.year)
         for i in example_input:
             output = model(torch.tensor(example_input[i]).unsqueeze(0))
-            print(self.nba_team_dict[i], output)
             # Example target (for training purposes)
             example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[i]])  # Example target labels for classification
             # Compute loss
             loss = criterion(output, example_target)
-            print(f'Loss: {loss.item()}')
 
             # Backward pass and optimization
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            print()
         torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
         }, 'model.pth')
     def performModelNoUpdate(self):
         s = statHandler(self.year)
-        players = s.calculateTopPlayers()
+        players = s.calculateTopPlayers(True)
         # Instantiate the model
         model = SimpleNN()
 
         # Define loss function and optimizer
         criterion = nn.MSELoss()  # For classification problems
         optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+        #load trained model
         checkpoint = torch.load('model.pth')
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
@@ -575,11 +520,15 @@ class Performer():
             loss = criterion(output, example_target)
             print(f'Loss: {loss.item()}')
             print()
-for i in range(1984, 1993):
-    p = Performer(str(i))
-    p.performModel()
+epochs = 10
+for e in range(0, epochs):
+    for i in range(1984, 1993):
+        p = Performer(str(i))
+        p.performModel()
+    if (e % int(epochs / 10) == 0):
+        print(str(int(10 * e / (epochs / 10)))+ '%...')
 p = Performer("2024")
 p.performModelNoUpdate()
-for i in range(1994, 2024):
-    statHandler.saveData(str(i))
+###for i in range(1994, 2024):
+    ###statHandler.saveData(str(i))
 
