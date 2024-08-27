@@ -105,10 +105,11 @@ class statHandler():
         self.year = year
         self.players = []
     def getStats(self):
-        url = "https://www.basketball-reference.com/leagues/NBA_"+ self.year + "_totals.html"
-        page = urlopen(url)
-        html_bytes = page.read()
-        html = html_bytes.decode("utf-8")
+        ###url = "https://www.basketball-reference.com/leagues/NBA_"+ self.year + "_totals.html"
+        ##page = urlopen(url)
+        ##html_bytes = page.read()
+        ##html = html_bytes.decode("utf-8")
+        html = open("2023-24 NBA Player Stats_ Totals _ Basketball-Reference.com.html", "r").read()
         player_stats = html.split("</tr>")
 
         for i in player_stats:
@@ -129,10 +130,11 @@ class statHandler():
                                             stat_list[16], stat_list[17], stat_list[18], stat_list[19], stat_list[20], stat_list[21], stat_list[22], stat_list[23], stat_list[24], 
                                             stat_list[25], stat_list[26], stat_list[27], stat_list[28], stat_list[29], self.year))
                 
-        url = "https://www.basketball-reference.com/leagues/NBA_" + self.year + "_adj_shooting.html"
-        page = urlopen(url)
-        html_bytes = page.read()
-        html = html_bytes.decode("utf-8")
+        ###url = "https://www.basketball-reference.com/leagues/NBA_" + self.year + "_adj_shooting.html"
+        ###page = urlopen(url)
+        ###html_bytes = page.read()
+        ###html = html_bytes.decode("utf-8")
+        html = open("2023-24 NBA Player Stats_ Adjusted Shooting _ Basketball-Reference.com.html", "r").read()
         player_stats = html.split("</tr>")
         for ii in range(0, len(player_stats)):
             i = player_stats[ii]
@@ -156,10 +158,11 @@ class statHandler():
                         if(p.name == stat_list[0] and p.team == stat_list[1]):
                             p.ts_add = stat_list[3]
                             p.fg_add = stat_list[2]
-        url = "https://www.basketball-reference.com/leagues/NBA_"+ self.year +"_advanced.html"
-        page = urlopen(url)
-        html_bytes = page.read()
-        html = html_bytes.decode("utf-8")
+        ###url = "https://www.basketball-reference.com/leagues/NBA_"+ self.year +"_advanced.html"
+        ###page = urlopen(url)
+        ###html_bytes = page.read()
+        ###html = html_bytes.decode("utf-8")
+        html = open("2023-24 NBA Player Stats_ Advanced _ Basketball-Reference.com.html", "r").read()
         player_stats = html.split("</tr>")
         for ii in range(0, len(player_stats)):
             i = player_stats[ii]
@@ -354,7 +357,6 @@ class statHandler():
         for i in range(0, 10):
             p = self.players[i]
             print(p.id, p.name, p.team, str(p.rebounding))
-
     def calculateTopPlayers(self):
         self.getStats()
         self.calculateTopScorers()
@@ -381,17 +383,8 @@ class statHandler():
             p = self.players[i]
             print(p.id, p.name, p.team, str(p.vorp))
         return self.players
-        
-topPlayers = []
-for i in range(2000, 2005):
-    s = statHandler(str(i))
-    topPlayers.append(s.calculateTopPlayers()[0])
-topPlayers.sort(key=lambda x: x.vorp, reverse=True)
-
-print("TOP 10 MOST DOMINANT")
-for i in range(0, 10):
-    p = topPlayers[i]
-    print(p.year, p.name, p.team, str(p.vorp))
+s = statHandler("2024")
+s.calculateTopPlayers()
 
 
 
