@@ -1,4 +1,5 @@
 from urllib.request import urlopen
+import numpy as np
 import re
 
 class PlayerStats():
@@ -33,9 +34,71 @@ class PlayerStats():
         self.turnovers = bb
         self.personal_fouls = cc
         self.points = dd
+        self.defensive_win_shares = 'N/A'
+        self.defensive_win_share_normalized = None
+        self.win_shares = 'N/A'
+        self.defensive_plus_minus = 'N/A'
         self.fg_add = 'N/A'
         self.ts_add = 'N/A'
+        self.usage_percentage = 'N/A'
+        self.assist_rate = 'N/A'
+        self.steal_rate = 'N/A'
+        self.block_rate = 'N/A'
+        self.rebound_rate = 'N/A'
+        self.turnover_rate = 'N/A'
+        self.assist_share = 'N/A'
+        self.normal_ts = None
+        self.shot_volume = None
+        self.normal_assist = None
+        self.calc_assist_rates = None
+        self.normal_assist_volume = None
+        self.normal_rebounds = None
+        self.normal_rebounds_volume = None
         self.scoring = -999999999999999999999999999999999999999
+        self.rebounding = -999999999999999999999999999999999999999
+        self.playmaking = -999999999999999999999999999999999999999
+        self.defense = -999999999999999999999999999999999999999
+        self.vorp = -999999999999999999999999999999999999999
+    
+    def calcScoring(self):
+        if (self.normal_ts == None or self.normal_shot_volume == None):
+            return None
+        curr_stat = self.normal_ts + (1.5 * self.normal_shot_volume)
+        self.scoring = curr_stat
+        return curr_stat
+
+    def calcPlaymaking(self):
+        if (self.normal_assist == None or self.normal_assist_volume == None):
+            return None
+        curr_stat = self.normal_assist + (1.5 * self.normal_assist_volume)
+        self.playmaking = curr_stat
+        return curr_stat
+
+    def calcRebounding(self):
+        if (self.normal_rebounds == None):
+            return None
+        curr_stat = self.normal_rebounds + (1.5 * self.normal_rebounds_volume)
+        self.rebounding = curr_stat
+        return curr_stat
+
+    def calcDefense(self, offset, avg_blocks, avg_steals, avg_fouls, avg_win_share, avg_srate, avg_brate):
+        if (self.defensive_plus_minus == 'N/A' or self.defensive_win_shares == 'N/A'):
+            return None
+        block_num = (float(self.block_rate) / avg_brate) + (int(self.blocks) / avg_blocks)
+        steals_num = (float(self.steal_rate) / avg_srate) + (int(self.steals) / avg_steals)
+        fouls_num = int(self.personal_fouls) / avg_fouls
+        if(fouls_num < 1):
+            fouls_num = 1
+        box_defense = (block_num + steals_num) / (fouls_num)
+
+        advanced_defense = float(self.defensive_plus_minus) * int(self.games_played) / 10
+        curr_stat = box_defense + advanced_defense - offset
+        self.defense = curr_stat
+        return curr_stat
+
+    def calcVorp(self, avg_win_shares):
+        if(self.defensive_win_share_normalized != None):
+            self.vorp = (.5 * self.rebounding) + (2.5 * self.scoring) + self.playmaking + (2 * self.defensive_win_share_normalized)
 
 url = "https://www.basketball-reference.com/leagues/NBA_2024_totals.html"
 page = urlopen(url)
@@ -44,6 +107,7 @@ html = html_bytes.decode("utf-8")
 player_stats = html.split("</tr>")
 players = []
 excluded = []
+
 for i in player_stats:
     stats = i.split("</td>")
     if (len(stats) == 30):
@@ -90,11 +154,50 @@ for ii in range(0, len(player_stats)):
                 if(p.name == stat_list[0] and p.team == stat_list[1]):
                     p.ts_add = stat_list[3]
                     p.fg_add = stat_list[2]
+url = "https://www.basketball-reference.com/leagues/NBA_2024_advanced.html"
+page = urlopen(url)
+html_bytes = page.read()
+html = html_bytes.decode("utf-8")
+player_stats = html.split("</tr>")
+for ii in range(0, len(player_stats)):
+    i = player_stats[ii]
+    stats = i.split("</td>")
+    if(len(stats) == 29):
+        stat_list = []
+        for j in stats:
+            x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
+            y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
+            if (len(x) > 0):
+                if (x[0][11:len(x[0]) - 1] == 'ast_pct'
+                    or x[0][11:len(x[0]) - 1] == 'blk_pct'
+                    or x[0][11:len(x[0]) - 1] == 'stl_pct'
+                    or x[0][11:len(x[0]) - 1] == 'trb_pct'
+                    or x[0][11:len(x[0]) - 1] == 'tov_pct'
+                    or x[0][11:len(x[0]) - 1] == 'usg_pct'
+                    or x[0][11:len(x[0]) - 1] == 'dbpm'
+                    or x[0][11:len(x[0]) - 1] == 'dws'
+                    or x[0][11:len(x[0]) - 1] == 'ws'
+                    or x[0][11:len(x[0]) - 1] == 'team_id'):
+                    if(len(y) > 0):
+                        stat_list.append(y[0][1:])
+                elif(x[0][11:len(x[0]) - 1] == 'ranker'):
+                    if(len(y) > 1):
+                        stat_list.append(y[1][1:])
+        if(len(stat_list) == 11):
+            for p in players:
+                if(p.name == stat_list[0] and p.team == stat_list[1]):
+                    p.rebound_rate = stat_list[2]
+                    p.assist_rate = stat_list[3]
+                    p.steal_rate = stat_list[4]
+                    p.block_rate = stat_list[5]
+                    p.turnover_rate = stat_list[6]
+                    p.usage_percentage = stat_list[7]
+                    p.defensive_win_shares = stat_list[8]
+                    p.win_shares = stat_list[9]
+                    p.defensive_plus_minus = stat_list[10]
 
-max = None
-max_stat = 0
-count = 0
-total = 0
+
+
 countDict = {}
 for p in players:
     if (p.name in countDict):
@@ -109,58 +212,176 @@ for c in countDict:
         for p in players:
             if (p.name == c and p.team != 'TOT'):
                 players.remove(p)
-def mergeSort(arr):
-    if (len(arr) > 1):
-        mid = int(len(arr) / 2)
-        a = mergeSort(arr[:mid])
-        b = mergeSort(arr[mid:])
-        aPointer = 0
-        bPointer = 0
-        fin = []
-        for i in range(0, len(arr)):
-            if (aPointer >= len(a)):
-                fin.append(b[bPointer])
-                bPointer+=1
-            elif (bPointer >= len(b)):
-                fin.append(a[aPointer])
-                aPointer+=1
-            elif(a[aPointer].scoring > b[bPointer].scoring):
-                fin.append(a[aPointer])
-                aPointer+=1
-            else:
-                fin.append(b[bPointer])
-                bPointer +=1
-        return fin
-    else:
-        return arr
 
-def calcScoring(p):
-    curr_stat = float(p.ts_add) + (.25 * (int(p.field_goals_attempted) + (.5 * int(p.free_throws_attempted)))) + 0.5 * float(p.fg_add)
-    curr_stat /= int(p.games_played)
-    return curr_stat
 
+
+ts_add_arr = []
 for p in players:
-    if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
-        continue
-    curr_stat = calcScoring(p)
-    count+=1
-    total+= curr_stat
-offset = -1 * total / count
-count = 0
-total = 0
-
-
+    if(p.ts_add != 'N/A'):
+        ts_add_arr.append(float(p.ts_add))
+mean = np.mean(ts_add_arr)
+std = np.std(ts_add_arr)
 for p in players:
-    if (p.ts_add == 'N/A' or p.fg_add == 'N/A'):
-        continue
-    curr_stat = calcScoring(p)
-    curr_stat += offset
-    p.scoring = curr_stat
-sortedScoring = mergeSort(players)
+    if(p.ts_add != 'N/A'):
+        p.normal_ts = (float(p.ts_add) - mean) / std
+shot_volume_arr = []
+for p in players:
+    p.shot_volume = int(p.field_goals_attempted) + (0.44 * int(p.free_throws_attempted))
+    shot_volume_arr.append(p.shot_volume)
+
+mean = np.mean(shot_volume_arr)
+std = np.std(shot_volume_arr)
+for p in players:
+    p.normal_shot_volume = (float(p.shot_volume) - mean) / std
+count, total = 0, 0
+for p in players:
+    score = p.calcScoring()
+
+players.sort(key=lambda x: x.scoring, reverse=True)
+max_val = players[0].scoring
+for p in players:
+    p.scoring /= max_val
+print("TOP 10 SCORERS")
 for i in range(0, 10):
-    p = sortedScoring[i]
-    print(p.id + ' '+ p.name + ' ' + p.team + ' ' + str(p.scoring))
+    p = players[i]
+    print(p.id, p.name, p.team, str(p.scoring))
+
+rates_arr = []
+for p in players:
+    if(p.assist_rate == 'N/A' or p.turnover_rate == 'N/A' or p.usage_percentage == 'N/A'):
+        continue
+    assist_rate = (float(p.assist_rate) - float(p.turnover_rate)) / float(p.usage_percentage)
+    rates_arr.append(assist_rate)
+    p.calc_assist_rates = assist_rate
+mean, std = np.mean(rates_arr), np.std(rates_arr)
+for p in players:
+    if(p.calc_assist_rates == None):
+        continue
+    p.normal_assist = (p.calc_assist_rates - mean) / std
+
+assist_vols = []
+for p in players:
+    rates_arr.append(int(p.assists))
+mean, std = np.mean(rates_arr), np.std(rates_arr)
+
+for p in players:
+    p.normal_assist_volume = (int(p.assists) - mean) / std
+for p in players:
+    score = p.calcPlaymaking()
     
 
 
+players.sort(key=lambda x: x.playmaking, reverse=True)
+print()
+max_val = players[0].playmaking
+for p in players:
+    p.playmaking /= max_val
+print("TOP 10 PLAYMAKERS")
+for i in range(0, 10):
+    p = players[i]
+    print(p.id, p.name, p.team, str(p.playmaking))
+
+count = 0
+total = 0
+total_blocks, total_steals, total_fouls, total_shares, total_brate, total_srate = 0, 0, 0, 0, 0, 0
+for p in players:
+    total_blocks += int(p.blocks)
+    total_fouls += int(p.personal_fouls)
+    total_steals += int(p.steals)
+    if (p.defensive_win_shares != 'N/A' and p.defensive_plus_minus != 'N/A' and p.steal_rate != 'N/A' and p.block_rate != 'N/A') :
+        count+=1
+        total_shares += float(p.defensive_win_shares)
+        total_srate += float(p.steal_rate)
+        total_brate += float(p.block_rate)
+
+total_blocks /= len(players)
+total_fouls /= len(players)
+total_steals /= len(players)
+total_brate /= count
+total_srate /= count
+total_shares /= count
+
+count = 0
+for p in players:
+    score = p.calcDefense(0, total_blocks, total_steals,total_fouls, total_shares, total_srate, total_brate)
+    if (score != None):
+        count+=1
+        total+= score
+for p in players:
+    p.calcDefense(-1 * total/count, total_blocks, total_steals,total_fouls, total_shares, total_srate, total_brate)
+    
+
+
+players.sort(key=lambda x: x.defense, reverse=True)
+max_val = players[0].defense
+for p in players:
+    p.defense /= max_val
+print()
+print("TOP 10 DEFENDERS")
+for i in range(0, 10):
+    p = players[i]
+    print(p.id, p.name, p.team, str(p.defense))
+
+reb_rates = []
+for p in players:
+    if (p.rebound_rate == 'N/A'):
+        continue
+    reb_rates.append(float(p.rebound_rate))
+mean, std = np.mean(reb_rates), np.std(reb_rates)
+
+for p in players:
+    if (p.rebound_rate == 'N/A'):
+        continue
+    p.normal_rebounds = (float(p.rebound_rate) - mean) / std
+
+off_rebs, def_rebs = [], []
+for p in players:
+    off_rebs.append(int(p.offensive_rebounds))
+    def_rebs.append(int(p.defensive_rebounds))
+off_mean, off_std, def_mean, def_std = np.mean(off_rebs), np.std(off_rebs), np.mean(def_rebs), np.std(def_rebs)
+for p in players:
+    p.normal_rebounds_volume = 0.5 * (((int(p.offensive_rebounds) - off_mean) / off_std) + ((int(p.defensive_rebounds) - def_mean) / def_std))
+for p in players:
+    score = p.calcRebounding()
+    
+
+
+players.sort(key=lambda x: x.rebounding, reverse=True)
+max_val = players[0].rebounding
+for p in players:
+    p.rebounding /= max_val
+
+print()
+print("TOP 10 REBOUNDERS")
+for i in range(0, 10):
+    p = players[i]
+    print(p.id, p.name, p.team, str(p.rebounding))
+
+count = 0
+total_off_shares = 0
+for p in players:
+    if(p.win_shares != 'N/A'):
+        count +=1
+        total_off_shares += float(p.win_shares)
+total_off_shares /= count
+count = 0
+players.sort(key=lambda x: x.defensive_win_shares, reverse=True)
+max_val = None
+for p in players:
+    if(p.defensive_win_shares != 'N/A'):
+        max_val = float(p.defensive_win_shares)
+        break
+for p in players:
+    if(p.defensive_win_shares != 'N/A'):
+        p.defensive_win_share_normalized = float(p.defensive_win_shares) / max_val
+for p in players:
+    p.calcVorp(total_off_shares)
+
+players.sort(key=lambda x: x.vorp, reverse=True)
+
+print()
+print("TOP 10 PLAYERS")
+for i in range(0, 10):
+    p = players[i]
+    print(p.id, p.name, p.team, str(p.vorp)) 
 
