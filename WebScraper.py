@@ -520,15 +520,17 @@ class Performer():
             loss = criterion(output, example_target)
             print(f'Loss: {loss.item()}')
             print()
-epochs = 10
-for e in range(0, epochs):
-    for i in range(1984, 1993):
-        p = Performer(str(i))
-        p.performModel()
-    if (e % int(epochs / 10) == 0):
-        print(str(int(10 * e / (epochs / 10)))+ '%...')
+    def trainForEpochs(epochs):
+        epochs = 10
+        for e in range(0, epochs):
+            for i in range(1984, 1993):
+                p = Performer(str(i))
+                p.performModel()
+            if (e % int(epochs / 10) == 0):
+                print(str(int(10 * e / (epochs / 10)))+ '%...')
+###Performer.trainForEpochs(10)
 p = Performer("2024")
 p.performModelNoUpdate()
-###for i in range(1994, 2024):
-    ###statHandler.saveData(str(i))
+for i in range(1994, 2024):
+    statHandler.saveData(str(i))
 
