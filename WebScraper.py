@@ -1,7 +1,13 @@
 from urllib.request import urlopen
 import numpy as np
 import re
-
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import optuna
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 class PlayerStats():
     def __init__(self, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, bb, cc, dd, ee):
         self.id = a
@@ -109,9 +115,8 @@ class statHandler():
         ##page = urlopen(url)
         ##html_bytes = page.read()
         ##html = html_bytes.decode("utf-8")
-        html = open("2023-24 NBA Player Stats_ Totals _ Basketball-Reference.com.html", "r").read()
+        html = open(self.year+"total.html", "r").read()
         player_stats = html.split("</tr>")
-
         for i in player_stats:
             stats = i.split("</td>")
             if (len(stats) == 30):
@@ -123,7 +128,7 @@ class statHandler():
                         c = z[1:]
                         if (c != '\n'):
                             stat_list.append(c)
-                if(len(stat_list) < 30):
+                if(len(stat_list) < 30 or stat_list[4] == 'TOT'):
                     continue
                 self.players.append(PlayerStats(stat_list[0], stat_list[1], stat_list[2], stat_list[3], stat_list[4], stat_list[5], stat_list[6], stat_list[7], stat_list[8], 
                                         stat_list[9], stat_list[10], stat_list[11], stat_list[12], stat_list[13], stat_list[14], stat_list[15], 
@@ -134,7 +139,7 @@ class statHandler():
         ###page = urlopen(url)
         ###html_bytes = page.read()
         ###html = html_bytes.decode("utf-8")
-        html = open("2023-24 NBA Player Stats_ Adjusted Shooting _ Basketball-Reference.com.html", "r").read()
+        html = open(self.year+"shooting.html", "r").read()
         player_stats = html.split("</tr>")
         for ii in range(0, len(player_stats)):
             i = player_stats[ii]
@@ -162,7 +167,7 @@ class statHandler():
         ###page = urlopen(url)
         ###html_bytes = page.read()
         ###html = html_bytes.decode("utf-8")
-        html = open("2023-24 NBA Player Stats_ Advanced _ Basketball-Reference.com.html", "r").read()
+        html = open(self.year+"advanced.html", "r").read()
         player_stats = html.split("</tr>")
         for ii in range(0, len(player_stats)):
             i = player_stats[ii]
@@ -200,20 +205,7 @@ class statHandler():
                             p.defensive_win_shares = stat_list[8]
                             p.win_shares = stat_list[9]
                             p.defensive_plus_minus = stat_list[10]
-        countDict = {}
-        for p in self.players:
-            if (p.name in countDict):
-                countDict[p.name] +=1
-            else:
-                countDict[p.name] = 1
-        for c in countDict:
-            if (countDict[c] > 1):
-                for p in self.players:
-                    if (p.name == c and p.team != 'TOT'):
-                        self.players.remove(p)
-                for p in self.players:
-                    if (p.name == c and p.team != 'TOT'):
-                        self.players.remove(p)
+
 
 
     def calculateTopScorers(self):
@@ -383,8 +375,211 @@ class statHandler():
             p = self.players[i]
             print(p.id, p.name, p.team, str(p.vorp))
         return self.players
-s = statHandler("2024")
-s.calculateTopPlayers()
+    def saveData(year):
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_advanced.html")
+        html_content = response.read()
+        with open(year+"advanced.html", 'wb') as file:
+            file.write(html_content)
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_ratings.html")
+        html_content = response.read()
+        with open(year+"teams.html", 'wb') as file:
+            file.write(html_content)
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_adj_shooting.html")
+        html_content = response.read()
+        with open(year+"shooting.html", 'wb') as file:
+            file.write(html_content)
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_totals.html")
+        html_content = response.read()
+        with open(year+"total.html", 'wb') as file:
+            file.write(html_content)
+    def getYearStats(year):
+        html = open(year+"teams.html", "r").read()
+        player_stats = html.split("</tr>")
+        nba_dict = {}
+        for i in player_stats:
+            stats = i.split("</td>")
+            if(len(stats) == 15):
+                stat_list = []
+                for j in stats:
+                    x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
+                    y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
+                    if (len(x) > 0):
+                        if (x[0][11:len(x[0]) - 1] == 'win_loss_pct'):
+                            if(len(y) > 0):
+                                stat_list.append(y[0][1:])
+                        elif(len(x) > 1 and x[1][11:len(x[1]) - 1] == 'team_name'):
+                            if(len(y) > 0):
+                                stat_list.append(y[len(y) - 1][1:])
+                if(len(stat_list) == 2):
+                    nba_dict[stat_list[0]] = float(stat_list[1])
+        return nba_dict
+                
+        # Save the HTML content to a file
+        
+class SimpleNN(nn.Module):
+    def __init__(self):
+        super(SimpleNN, self).__init__()
+        # Since we have 7 vectors of 4 elements each, input dimension will be 7 * 4 = 28
+        self.input_dim = 8 * 4
+        self.hidden_dim1 = 64
+        self.hidden_dim2 = 32
+        self.output_dim = 1  # Adjust based on your specific problem (e.g., number of classes for classification)
+
+        # Define the layers
+        self.fc1 = nn.Linear(self.input_dim, self.hidden_dim1)
+        self.fc2 = nn.Linear(self.hidden_dim1, self.hidden_dim2)
+        self.fc3 = nn.Linear(self.hidden_dim2, self.output_dim)
+
+    def forward(self, x):
+        x = x.view(-1, 8 * 4)
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+class Performer():
+    def __init__(self, year):
+        # Dictionary mapping 3-letter team codes to team names
+        self.nba_team_dict = {
+            'ATL': 'Atlanta Hawks',
+            'BOS': 'Boston Celtics',
+            'BKN': 'Brooklyn Nets',
+            'CHA': 'Charlotte Hornets',
+            'CHO': 'Charlotte Hornets',
+            'CHH': 'Charlotte Hornets',
+            'CHI': 'Chicago Bulls',
+            'CLE': 'Cleveland Cavaliers',
+            'DAL': 'Dallas Mavericks',
+            'DEN': 'Denver Nuggets',
+            'DET': 'Detroit Pistons',
+            'GSW': 'Golden State Warriors',
+            'HOU': 'Houston Rockets',
+            'IND': 'Indiana Pacers',
+            'LAC': 'Los Angeles Clippers',
+            'SDC': 'San Diego Clippers',
+            'LAL': 'Los Angeles Lakers',
+            'MEM': 'Memphis Grizzlies',
+            'MIA': 'Miami Heat',
+            'MIL': 'Milwaukee Bucks',
+            'MIN': 'Minnesota Timberwolves',
+            'NOP': 'New Orleans Pelicans',
+            'NYK': 'New York Knicks',
+            'OKC': 'Oklahoma City Thunder',
+            'ORL': 'Orlando Magic',
+            'PHI': 'Philadelphia 76ers',
+            'PHX': 'Phoenix Suns',
+            'PHO': 'Phoenix Suns',
+            'POR': 'Portland Trail Blazers',
+            'SAC': 'Sacramento Kings',
+            'SAS': 'San Antonio Spurs',
+            'TOR': 'Toronto Raptors',
+            'UTA': 'Utah Jazz',
+            'WAS': 'Washington Wizards',
+            'WSB': 'Washington Bullets',
+            'SEA': 'Seattle SuperSonics',
+            'NJN': 'New Jersey Nets',
+            'KCK': 'Kansas City Kings',
+            'BRK': 'Brooklyn Nets'
+        }
+
+        self.nba_team_codes = [
+            'ATL', 'BOS', 'BKN', 'CHA', 'CHO', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW', 
+            'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOP', 'NYK', 
+            'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS', 
+            'WSB', 'SEA', 'NJN', 'PHO', 'SDC', 'KCK', 'BRK', 'CHH'
+        ]
+
+        # Initialize the dictionary with team codes as keys and 0 as values
+        self.nba_team_arrs = {code: [] for code in self.nba_team_codes}
+        self.nba_team_wins = statHandler.getYearStats(year)
+        self.year = year
 
 
+    def performModel(self):
+        s = statHandler(self.year)
+        players = s.calculateTopPlayers()
+        # Instantiate the model
+        model = SimpleNN()
+
+        # Define loss function and optimizer
+        criterion = nn.MSELoss()  # For classification problems
+        optimizer = optim.Adam(model.parameters(), lr=0.01)
+        checkpoint = torch.load('model.pth')
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+        # Example input (batch size of 2 for demonstration)
+        # Each input tensor has the shape (batch_size, 7, 4)
+        
+        example_input = {}
+        for p in players:
+            if (p.team not in self.nba_team_arrs):
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+            elif(len(self.nba_team_arrs[p.team]) < 8):
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+        # Forward pass
+        for a in self.nba_team_arrs:
+            if(len(self.nba_team_arrs[a]) == 8):
+                example_input[a] = self.nba_team_arrs[a]
+        print('RESULTS: ', self.year)
+        for i in example_input:
+            output = model(torch.tensor(example_input[i]).unsqueeze(0))
+            print(self.nba_team_dict[i], output)
+            # Example target (for training purposes)
+            example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[i]])  # Example target labels for classification
+            # Compute loss
+            loss = criterion(output, example_target)
+            print(f'Loss: {loss.item()}')
+
+            # Backward pass and optimization
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            print()
+        torch.save({
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+        }, 'model.pth')
+    def performModelNoUpdate(self):
+        s = statHandler(self.year)
+        players = s.calculateTopPlayers()
+        # Instantiate the model
+        model = SimpleNN()
+
+        # Define loss function and optimizer
+        criterion = nn.MSELoss()  # For classification problems
+        optimizer = optim.Adam(model.parameters(), lr=0.01)
+        checkpoint = torch.load('model.pth')
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+        # Example input (batch size of 2 for demonstration)
+        # Each input tensor has the shape (batch_size, 7, 4)
+        
+        example_input = {}
+        for p in players:
+            if (p.team not in self.nba_team_arrs):
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+            elif(len(self.nba_team_arrs[p.team]) < 8):
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+        # Forward pass
+        for a in self.nba_team_arrs:
+            if(len(self.nba_team_arrs[a]) == 8):
+                example_input[a] = self.nba_team_arrs[a]
+        print('RESULTS: ', self.year)
+        for i in example_input:
+            output = model(torch.tensor(example_input[i]).unsqueeze(0))
+            print(self.nba_team_dict[i], output)
+            # Example target (for training purposes)
+            example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[i]])  # Example target labels for classification
+            # Compute loss
+            loss = criterion(output, example_target)
+            print(f'Loss: {loss.item()}')
+            print()
+for i in range(1984, 1993):
+    p = Performer(str(i))
+    p.performModel()
+p = Performer("2024")
+p.performModelNoUpdate()
+for i in range(1994, 2024):
+    statHandler.saveData(str(i))
 
