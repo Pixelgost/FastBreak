@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import optuna
+from pathlib import Path
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -66,31 +67,37 @@ class PlayerStats():
         self.playmaking = -999999999999999999999999999999999999999
         self.defense = -999999999999999999999999999999999999999
         self.vorp = -999999999999999999999999999999999999999
+        self.normal_vorp = -999999999999999999999999999999999999999
+        self.vol_modifier = 1.5
+        self.rebound_modifier = .5
+        self.scoring_modifier = 2.5
+        self.playmaking_modifier = 1
+        self.defense_modifier = 2
     
     def calcScoring(self):
         if (self.normal_ts == None or self.normal_shot_volume == None):
             return None
-        curr_stat = self.normal_ts + (1.5 * self.normal_shot_volume)
+        curr_stat = self.normal_ts + (self.vol_modifier * self.normal_shot_volume)
         self.scoring = curr_stat
         return curr_stat
 
     def calcPlaymaking(self):
         if (self.normal_assist == None or self.normal_assist_volume == None):
             return None
-        curr_stat = self.normal_assist + (1.5 * self.normal_assist_volume)
+        curr_stat = self.normal_assist + (self.vol_modifier * self.normal_assist_volume)
         self.playmaking = curr_stat
         return curr_stat
 
     def calcRebounding(self):
         if (self.normal_rebounds == None):
             return None
-        curr_stat = self.normal_rebounds + (1.5 * self.normal_rebounds_volume)
+        curr_stat = self.normal_rebounds + (self.vol_modifier * self.normal_rebounds_volume)
         self.rebounding = curr_stat
         return curr_stat
 
     def calcVorp(self):
         if(self.defensive_win_share_normalized != None):
-            self.vorp = (.5 * self.rebounding) + (2.5 * self.scoring) + self.playmaking + (2 * self.defensive_win_share_normalized)
+            self.vorp = (self.rebound_modifier * self.rebounding) + (self.scoring_modifier * self.scoring) + (self.playmaking_modifier * self.playmaking) + (self.defense_modifier * self.defensive_win_share_normalized)
             return self.vorp
 class statHandler():
     def __init__(self, year) -> None:
@@ -295,6 +302,7 @@ class statHandler():
             for i in range(0, 10):
                 p = self.players[i]
                 print(p.id, p.name, p.team, str(p.rebounding))
+
     def calculateTopPlayers(self, pr):
         self.getStats()
         self.calculateTopScorers(pr)
@@ -312,17 +320,19 @@ class statHandler():
         vorpArr = []
         for p in self.players:
             vorpArr.append(p.calcVorp())
+        vorpArr = [i for i in vorpArr if i is not None]
+        self.players.sort(key=lambda x: x.vorp, reverse=True)
         mean, std = np.mean(vorpArr), np.std(vorpArr)
         for p in self.players:
-            p.vorp -= mean
-            p.vorp /= std
+            p.normal_vorp = p.vorp - mean
+            p.normal_vorp /= std
         self.players.sort(key=lambda x: x.vorp, reverse=True)
         if(pr):
             print()
             print("TOP 10 PLAYERS")
             for i in range(0, 10):
                 p = self.players[i]
-                print(p.id, p.name, p.team, str(p.vorp))
+                print(p.id, p.name, p.team, p.normal_vorp)
         return self.players
 
     def saveData(year):
@@ -455,9 +465,10 @@ class Performer():
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
         #load trained model
-        checkpoint = torch.load('model.pth')
-        model.load_state_dict(checkpoint['model_state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        if Path("model.pth").is_file():
+            checkpoint = torch.load('model.pth')
+            model.load_state_dict(checkpoint['model_state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
         # Example input (batch size of 2 for demonstration)
         # Each input tensor has the shape (batch_size, 7, 4)
@@ -526,14 +537,13 @@ class Performer():
             print(f'Loss: {loss.item()}')
             print()
     def trainForEpochs(epochs):
-        epochs = 10
         for e in range(0, epochs):
             for i in range(1984, 1993):
                 p = Performer(str(i))
                 p.performModel()
             if (e % int(epochs / 10) == 0):
                 print(str(int(10 * e / (epochs / 10)))+ '%...')
-###Performer.trainForEpochs(10)
+Performer.trainForEpochs(10)
 p = Performer("2024")
 p.performModelNoUpdate()
 for i in range(2008, 2024):
