@@ -91,6 +91,7 @@ class PlayerStats():
     def calcVorp(self):
         if(self.defensive_win_share_normalized != None):
             self.vorp = (.5 * self.rebounding) + (2.5 * self.scoring) + self.playmaking + (2 * self.defensive_win_share_normalized)
+            return self.vorp
 class statHandler():
     def __init__(self, year) -> None:
         self.year = year
@@ -308,9 +309,13 @@ class statHandler():
         for p in self.players:
             if(p.defensive_win_shares != 'N/A'):
                 p.defensive_win_share_normalized = float(p.defensive_win_shares) / max_val
+        vorpArr = []
         for p in self.players:
-            p.calcVorp()
-
+            vorpArr.append(p.calcVorp())
+        mean, std = np.mean(vorpArr), np.std(vorpArr)
+        for p in self.players:
+            p.vorp -= mean
+            p.vorp /= std
         self.players.sort(key=lambda x: x.vorp, reverse=True)
         if(pr):
             print()
@@ -531,6 +536,6 @@ class Performer():
 ###Performer.trainForEpochs(10)
 p = Performer("2024")
 p.performModelNoUpdate()
-for i in range(2001, 2024):
+for i in range(2008, 2024):
     statHandler.saveData(str(i))
 
