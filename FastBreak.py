@@ -9,6 +9,8 @@ from pathlib import Path
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import sys
+
 class PlayerStats():
     def __init__(self, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, bb, cc, dd, ee):
         self.id = a
@@ -43,7 +45,6 @@ class PlayerStats():
         self.points = dd
         self.year = ee
         self.defensive_win_shares = 'N/A'
-        self.defensive_win_share_normalized = None
         self.win_shares = 'N/A'
         self.defensive_plus_minus = 'N/A'
         self.fg_add = 'N/A'
@@ -62,12 +63,13 @@ class PlayerStats():
         self.normal_assist_volume = None
         self.normal_rebounds = None
         self.normal_rebounds_volume = None
-        self.scoring = -999999999999999999999999999999999999999
-        self.rebounding = -999999999999999999999999999999999999999
-        self.playmaking = -999999999999999999999999999999999999999
-        self.defense = -999999999999999999999999999999999999999
-        self.vorp = -999999999999999999999999999999999999999
-        self.normal_vorp = -999999999999999999999999999999999999999
+        self.defensive_win_share_normalized = -sys.maxsize - 1
+        self.scoring = -sys.maxsize - 1
+        self.rebounding = -sys.maxsize - 1
+        self.playmaking = -sys.maxsize - 1
+        self.defense = -sys.maxsize - 1
+        self.vorp = -sys.maxsize - 1
+        self.normal_vorp = -sys.maxsize - 1
         self.vol_modifier = 1.5
         self.rebound_modifier = .5
         self.scoring_modifier = 2.5
@@ -302,21 +304,27 @@ class statHandler():
             for i in range(0, 10):
                 p = self.players[i]
                 print(p.id, p.name, p.team, str(p.rebounding))
-
+    def calculateTopDefenders(self, pr):
+        max_val = None
+        for p in self.players:
+            if (p.defensive_win_shares != 'N/A' and (max_val == None or float(p.defensive_win_shares) > max_val)):
+                max_val = float(p.defensive_win_shares)
+        for p in self.players:
+            if(p.defensive_win_shares != 'N/A'):
+                p.defensive_win_share_normalized = float(p.defensive_win_shares) / max_val
+        self.players.sort(key=lambda x: x.defensive_win_share_normalized, reverse=True)
+        if(pr):
+            print()
+            print("TOP 10 DEFENDERS")
+            for i in range(0, 10):
+                p = self.players[i]
+                print(p.id, p.name, p.team, p.defensive_win_share_normalized)
     def calculateTopPlayers(self, pr):
         self.getStats()
         self.calculateTopScorers(pr)
         self.calculateTopPlayMakers(pr)
         self.calculateTopRebounders(pr)
-        self.players.sort(key=lambda x: x.defensive_win_shares, reverse=True)
-        max_val = None
-        for p in self.players:
-            if(p.defensive_win_shares != 'N/A'):
-                max_val = float(p.defensive_win_shares)
-                break
-        for p in self.players:
-            if(p.defensive_win_shares != 'N/A'):
-                p.defensive_win_share_normalized = float(p.defensive_win_shares) / max_val
+        self.calculateTopDefenders(pr)
         vorpArr = []
         for p in self.players:
             vorpArr.append(p.calcVorp())
@@ -546,6 +554,6 @@ class Performer():
 Performer.trainForEpochs(10)
 p = Performer("2024")
 p.performModelNoUpdate()
-for i in range(2008, 2024):
+for i in range(2022, 2024):
     statHandler.saveData(str(i))
 
