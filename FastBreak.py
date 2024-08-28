@@ -446,14 +446,19 @@ class Performer():
             'SEA': 'Seattle SuperSonics',
             'NJN': 'New Jersey Nets',
             'KCK': 'Kansas City Kings',
-            'BRK': 'Brooklyn Nets'
+            'BRK': 'Brooklyn Nets',
+            'VAN': 'Vancouver Grizzlies',
+            'CHA2005': 'Charlotte Bobcats',
+            'NOH': 'New Orleans Hornets',
+            'NOK': 'New Orleans',
         }
 
         self.nba_team_codes = [
             'ATL', 'BOS', 'BKN', 'CHA', 'CHO', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW', 
             'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOP', 'NYK', 
             'OKC', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS', 
-            'WSB', 'SEA', 'NJN', 'PHO', 'SDC', 'KCK', 'BRK', 'CHH'
+            'WSB', 'SEA', 'NJN', 'PHO', 'SDC', 'KCK', 'BRK', 'CHH', 'VAN', 'CHA2005', 'NOH'
+            'NOK'
         ]
 
         # Initialize the dictionary with team codes as keys and 0 as values
@@ -494,7 +499,10 @@ class Performer():
         for i in example_input:
             output = model(torch.tensor(example_input[i]).unsqueeze(0))
             # Example target (for training purposes)
-            example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[i]])  # Example target labels for classification
+            key = i
+            if (key == 'CHA' and int(self.year) < 2014):
+                key = 'CHA2005'
+            example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[key]])  # Example target labels for classification
             # Compute loss
             loss = criterion(output, example_target)
 
@@ -537,23 +545,29 @@ class Performer():
         print('RESULTS: ', self.year)
         for i in example_input:
             output = model(torch.tensor(example_input[i]).unsqueeze(0))
-            print(self.nba_team_dict[i], output)
             # Example target (for training purposes)
-            example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[i]])  # Example target labels for classification
+            key = i
+            if (key == 'CHA' and int(self.year) < 2014):
+                key = 'CHA2005'
+            example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[key]])  # Example target labels for classification
             # Compute loss
+            print(self.nba_team_dict[i], output.detach().numpy()[0][0], self.nba_team_wins[self.nba_team_dict[key]])
             loss = criterion(output, example_target)
             print(f'Loss: {loss.item()}')
             print()
     def trainForEpochs(epochs):
         for e in range(0, epochs):
-            for i in range(1984, 1993):
-                p = Performer(str(i))
-                p.performModel()
-            if (e % int(epochs / 10) == 0):
-                print(str(int(10 * e / (epochs / 10)))+ '%...')
-Performer.trainForEpochs(10)
+            for i in range(1980, 2024):
+                if (i % 10 != 3 and i % 10 != 4):
+                    p = Performer(str(i))
+                    p.performModel()
+            if (e % int(epochs / 20) == 0):
+                val = int(5 * e / (epochs / 20))
+                if (val > 0):
+                    print(str(val)+ '%...')
+Performer.trainForEpochs(100)
 p = Performer("2024")
 p.performModelNoUpdate()
-for i in range(2022, 2024):
-    statHandler.saveData(str(i))
+
+
 
