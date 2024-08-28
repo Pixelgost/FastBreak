@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler
 import sys
 
 class PlayerStats():
+    #initalize variables
     def __init__(self, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, bb, cc, dd, ee):
         self.id = a
         self.name = b
@@ -76,6 +77,7 @@ class PlayerStats():
         self.playmaking_modifier = 1
         self.defense_modifier = 2
     
+    #calculate and set scoring var
     def calcScoring(self):
         if (self.normal_ts == None or self.normal_shot_volume == None):
             return None
@@ -83,6 +85,7 @@ class PlayerStats():
         self.scoring = curr_stat
         return curr_stat
 
+    #calculate and set playmaking var
     def calcPlaymaking(self):
         if (self.normal_assist == None or self.normal_assist_volume == None):
             return None
@@ -90,6 +93,7 @@ class PlayerStats():
         self.playmaking = curr_stat
         return curr_stat
 
+    #calculate and set rebounding var
     def calcRebounding(self):
         if (self.normal_rebounds == None):
             return None
@@ -97,53 +101,73 @@ class PlayerStats():
         self.rebounding = curr_stat
         return curr_stat
 
+    #calculate and set overall vorp
     def calcVorp(self):
         if(self.defensive_win_share_normalized != None):
             self.vorp = (self.rebound_modifier * self.rebounding) + (self.scoring_modifier * self.scoring) + (self.playmaking_modifier * self.playmaking) + (self.defense_modifier * self.defensive_win_share_normalized)
             return self.vorp
+
+#Class to calculate all statistics and pull them
 class statHandler():
+
+    #initalize instance and set target season
     def __init__(self, year) -> None:
         self.year = year
         self.players = []
+
+    #Get all necesary statistics from local files
     def getStats(self):
-        ###url = "https://www.basketball-reference.com/leagues/NBA_"+ self.year + "_totals.html"
-        ##page = urlopen(url)
-        ##html_bytes = page.read()
-        ##html = html_bytes.decode("utf-8")
+        #Get stats from the 'totals' sections (Season total stats)
         html = open(self.year+"total.html", "r").read()
+
+        #split table by columns and rows to get elements
         player_stats = html.split("</tr>")
         for i in player_stats:
             stats = i.split("</td>")
+
+            #make sure entry is from the necessary table
             if (len(stats) == 30):
                 stat_list = []
                 for j in stats:
+
+                    #isolate stat name (x), and stat value (y)
                     x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
                     y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
+
+                    #filter values that are invalid
                     for z in y:
                         c = z[1:]
                         if (c != '\n'):
                             stat_list.append(c)
+
+                #if all stats are found, and they have a team (not total stat), add it to list
                 if(len(stat_list) < 30 or stat_list[4] == 'TOT'):
                     continue
+                #
                 self.players.append(PlayerStats(stat_list[0], stat_list[1], stat_list[2], stat_list[3], stat_list[4], stat_list[5], stat_list[6], stat_list[7], stat_list[8], 
                                         stat_list[9], stat_list[10], stat_list[11], stat_list[12], stat_list[13], stat_list[14], stat_list[15], 
                                             stat_list[16], stat_list[17], stat_list[18], stat_list[19], stat_list[20], stat_list[21], stat_list[22], stat_list[23], stat_list[24], 
                                             stat_list[25], stat_list[26], stat_list[27], stat_list[28], stat_list[29], self.year))
                 
-        ###url = "https://www.basketball-reference.com/leagues/NBA_" + self.year + "_adj_shooting.html"
-        ###page = urlopen(url)
-        ###html_bytes = page.read()
-        ###html = html_bytes.decode("utf-8")
+        #get the stats for precise shooting
         html = open(self.year+"shooting.html", "r").read()
+
+        #split table by column and row to get elements
         player_stats = html.split("</tr>")
         for ii in range(0, len(player_stats)):
             i = player_stats[ii]
             stats = i.split("</td>")
+
+            #check if the table is correct
             if(len(stats) == 28):
                 stat_list = []
                 for j in stats:
+
+                    #get stat name (x), and stat value (y)
                     x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
                     y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
+
+                    #check if the stat is one we need
                     if (len(x) > 0):
                         if (x[0][11:len(x[0]) - 1] == 'fg_pts_added' 
                             or x[0][11:len(x[0]) - 1] == 'ts_pts_added' 
@@ -153,25 +177,34 @@ class statHandler():
                         elif(x[0][11:len(x[0]) - 1] == 'ranker'):
                             if(len(y) > 1):
                                 stat_list.append(y[1][1:])
+                    
+                #if all stats are present add it to the correct player
                 if(len(stat_list) == 4):
                     for p in self.players:
                         if(p.name == stat_list[0] and p.team == stat_list[1]):
                             p.ts_add = stat_list[3]
                             p.fg_add = stat_list[2]
-        ###url = "https://www.basketball-reference.com/leagues/NBA_"+ self.year +"_advanced.html"
-        ###page = urlopen(url)
-        ###html_bytes = page.read()
-        ###html = html_bytes.decode("utf-8")
+        
+        #get advanced stats
         html = open(self.year+"advanced.html", "r").read()
+
+        #split table by columns and rows into elements
         player_stats = html.split("</tr>")
         for ii in range(0, len(player_stats)):
             i = player_stats[ii]
             stats = i.split("</td>")
+
+            #check if we are in the correct table
             if(len(stats) == 29):
                 stat_list = []
+
                 for j in stats:
+
+                    #isolate the stat name (x) and stat value (y)
                     x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
                     y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
+
+                    #if the stat is one we need, add it to the list
                     if (len(x) > 0):
                         if (x[0][11:len(x[0]) - 1] == 'ast_pct'
                             or x[0][11:len(x[0]) - 1] == 'blk_pct'
@@ -188,6 +221,8 @@ class statHandler():
                         elif(x[0][11:len(x[0]) - 1] == 'ranker'):
                             if(len(y) > 1):
                                 stat_list.append(y[1][1:])
+
+                #if the all stats are found, add it to the appropirate player
                 if(len(stat_list) == 11):
                     for p in self.players:
                         if(p.name == stat_list[0] and p.team == stat_list[1]):
@@ -202,66 +237,98 @@ class statHandler():
                             p.defensive_plus_minus = stat_list[10]
 
 
-
+    #calculate the top scorers
     def calculateTopScorers(self, pr):
         ts_add_arr = []
+        
+        #transform the 'points added by true shooting above average' stat, into a z-score
         for p in self.players:
             if(p.ts_add != 'N/A'):
                 ts_add_arr.append(float(p.ts_add))
-        mean = np.mean(ts_add_arr)
-        std = np.std(ts_add_arr)
+
+        #obtain the mean and standard deviation of the stat
+        mean, std = np.mean(ts_add_arr), np.std(ts_add_arr)
+
+        #normalize it
         for p in self.players:
             if(p.ts_add != 'N/A'):
                 p.normal_ts = (float(p.ts_add) - mean) / std
+
+        #calculate the volume statistic for scoring
         shot_volume_arr = []
         for p in self.players:
             p.shot_volume = int(p.field_goals_attempted) + (0.44 * int(p.free_throws_attempted))
             shot_volume_arr.append(p.shot_volume)
 
-        mean = np.mean(shot_volume_arr)
-        std = np.std(shot_volume_arr)
+        #find the mean and standard deviation and then normalize
+        mean, std = np.mean(shot_volume_arr), np.std(shot_volume_arr)
         for p in self.players:
             p.normal_shot_volume = (float(p.shot_volume) - mean) / std
+        
+        #calculate scoring
         for p in self.players:
             p.calcScoring()
 
+        #sort players from best to worst scorers
         self.players.sort(key=lambda x: x.scoring, reverse=True)
+
+        #set value so that top player has score of 1, and rest are percentages
         max_val = self.players[0].scoring
         for p in self.players:
             p.scoring /= max_val
+
+        #print list out if necessary
         if(pr):
             print("TOP 10 SCORERS")
             for i in range(0, 10):
                 p = self.players[i]
                 print(p.id, p.name, p.team, str(p.scoring))
 
+    #calculate top playmakers
     def calculateTopPlayMakers(self, pr):
         rates_arr = []
+
+        #calculate assist rates
         for p in self.players:
             if(p.assist_rate == 'N/A' or p.turnover_rate == 'N/A' or p.usage_percentage == 'N/A'):
                 continue
             assist_rate = (float(p.assist_rate) - float(p.turnover_rate)) / float(p.usage_percentage)
             rates_arr.append(assist_rate)
             p.calc_assist_rates = assist_rate
+        
+        #find mean and standard deviation of the assist rates
         mean, std = np.mean(rates_arr), np.std(rates_arr)
+        
+        #normalize the assist rates
         for p in self.players:
             if(p.calc_assist_rates == None):
                 continue
             p.normal_assist = (p.calc_assist_rates - mean) / std
 
-        for p in self.players:
-            rates_arr.append(int(p.assists))
-        mean, std = np.mean(rates_arr), np.std(rates_arr)
+        volume_arr = []
 
+        #find mean and standard dev of the volume of assists
+        for p in self.players:
+            volume_arr.append(int(p.assists))
+        mean, std = np.mean(volume_arr), np.std(volume_arr)
+
+        #normalize the assist volume
         for p in self.players:
             p.normal_assist_volume = (int(p.assists) - mean) / std
+        
+        #calculate playmaking score
         for p in self.players:
             p.calcPlaymaking()
-            
+        
+        #sort players from best to worst playmakers
         self.players.sort(key=lambda x: x.playmaking, reverse=True)
+
+        #set best playmaker to 1, and rest to percentages of the best player
         max_val = self.players[0].playmaking
         for p in self.players:
             p.playmaking /= max_val
+
+        #print findings if specified
         if(pr):
             print()
             print("TOP 10 PLAYMAKERS")
@@ -269,80 +336,121 @@ class statHandler():
                 p = self.players[i]
                 print(p.id, p.name, p.team, str(p.playmaking))
 
+    #calculate top rebounders
     def calculateTopRebounders(self, pr):
         reb_rates = []
+
         for p in self.players:
             if (p.rebound_rate == 'N/A'):
                 continue
             reb_rates.append(float(p.rebound_rate))
+
+        #find the mean and standard dev of rebound rates
         mean, std = np.mean(reb_rates), np.std(reb_rates)
 
+        #normalize the rates
         for p in self.players:
             if (p.rebound_rate == 'N/A'):
                 continue
             p.normal_rebounds = (float(p.rebound_rate) - mean) / std
 
         off_rebs, def_rebs = [], []
+
+        #find mean and standard dev of the two volume metrics
         for p in self.players:
             off_rebs.append(int(p.offensive_rebounds))
             def_rebs.append(int(p.defensive_rebounds))
         off_mean, off_std, def_mean, def_std = np.mean(off_rebs), np.std(off_rebs), np.mean(def_rebs), np.std(def_rebs)
+
+        #normalize the volume metrics and combine them
         for p in self.players:
             p.normal_rebounds_volume = 0.5 * (((int(p.offensive_rebounds) - off_mean) / off_std) + ((int(p.defensive_rebounds) - def_mean) / def_std))
+        
+        #calculate top rebounders
         for p in self.players:
             p.calcRebounding()
             
 
-
+        #sort best rebounder to worst
         self.players.sort(key=lambda x: x.rebounding, reverse=True)
+
+        #set top player to a score of 1, and the rest to a percentage
         max_val = self.players[0].rebounding
         for p in self.players:
             p.rebounding /= max_val
+
+        #print results if necessary
         if(pr):
             print()
             print("TOP 10 REBOUNDERS")
             for i in range(0, 10):
                 p = self.players[i]
                 print(p.id, p.name, p.team, str(p.rebounding))
+    
+    #calculate top defenders
     def calculateTopDefenders(self, pr):
         max_val = None
+        #set the defensive win share stat so best player is 1, and the rest are percentages
         for p in self.players:
             if (p.defensive_win_shares != 'N/A' and (max_val == None or float(p.defensive_win_shares) > max_val)):
                 max_val = float(p.defensive_win_shares)
+        
         for p in self.players:
             if(p.defensive_win_shares != 'N/A'):
                 p.defensive_win_share_normalized = float(p.defensive_win_shares) / max_val
+        
+        #sort by best to worst defender
         self.players.sort(key=lambda x: x.defensive_win_share_normalized, reverse=True)
+
+        #print results if necessary
         if(pr):
             print()
             print("TOP 10 DEFENDERS")
             for i in range(0, 10):
                 p = self.players[i]
                 print(p.id, p.name, p.team, p.defensive_win_share_normalized)
+
+    #calculate top players
     def calculateTopPlayers(self, pr):
+
+        #obtain stats
         self.getStats()
+
+        #calculate the necessary statistics
         self.calculateTopScorers(pr)
         self.calculateTopPlayMakers(pr)
         self.calculateTopRebounders(pr)
         self.calculateTopDefenders(pr)
         vorpArr = []
+        #calculate VORP for each player
         for p in self.players:
             vorpArr.append(p.calcVorp())
+        #filter out the blank stats
         vorpArr = [i for i in vorpArr if i is not None]
+
+        #sort from best to worst player
         self.players.sort(key=lambda x: x.vorp, reverse=True)
+        
+        #obtain mean and standard dev for vorp
         mean, std = np.mean(vorpArr), np.std(vorpArr)
+
+        #normalize vorp
         for p in self.players:
             p.normal_vorp = p.vorp - mean
             p.normal_vorp /= std
-        self.players.sort(key=lambda x: x.vorp, reverse=True)
+        
+        #print results if necessary
         if(pr):
             print()
             print("TOP 10 PLAYERS")
             for i in range(0, 10):
                 p = self.players[i]
                 print(p.id, p.name, p.team, p.normal_vorp)
+
+        #return full set of ranked player
         return self.players
 
+    #save the data by pulling it from the web
     def saveData(year):
         response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_advanced.html")
         html_content = response.read()
@@ -360,17 +468,28 @@ class statHandler():
         html_content = response.read()
         with open(year+"total.html", 'wb') as file:
             file.write(html_content)
+    
+    #get win/loss stat for each team from a given year
     def getYearStats(year):
+        #read proper file
         html = open(year+"teams.html", "r").read()
-        player_stats = html.split("</tr>")
         nba_dict = {}
+
+        #split table by rows and columns
+        player_stats = html.split("</tr>")
         for i in player_stats:
             stats = i.split("</td>")
+
+            #make sure we are in the right table
             if(len(stats) == 15):
                 stat_list = []
+
                 for j in stats:
+                    #isolate stat names(x) and stat value (y)
                     x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
                     y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
+
+                    #if the stat is win_loss_pct add it to list
                     if (len(x) > 0):
                         if (x[0][11:len(x[0]) - 1] == 'win_loss_pct'):
                             if(len(y) > 0):
@@ -378,20 +497,21 @@ class statHandler():
                         elif(len(x) > 1 and x[1][11:len(x[1]) - 1] == 'team_name'):
                             if(len(y) > 0):
                                 stat_list.append(y[len(y) - 1][1:])
+                
+                #set dictionary entry if stat was found
                 if(len(stat_list) == 2):
                     nba_dict[stat_list[0]] = float(stat_list[1])
         return nba_dict
                 
-        # Save the HTML content to a file
         
 class SimpleNN(nn.Module):
     def __init__(self):
         super(SimpleNN, self).__init__()
-        # Since we have 7 vectors of 4 elements each, input dimension will be 7 * 4 = 28
+        # Since we have 8 vectors of 4 elements each, input dimension will be 8 * 4 = 32
         self.input_dim = 8 * 4
         self.hidden_dim1 = 64
         self.hidden_dim2 = 32
-        self.output_dim = 1  # Adjust based on your specific problem (e.g., number of classes for classification)
+        self.output_dim = 1 
 
         # Define the layers
         self.fc1 = nn.Linear(self.input_dim, self.hidden_dim1)
@@ -453,6 +573,7 @@ class Performer():
             'NOK': 'New Orleans',
         }
 
+        #full list of 3 letter codes
         self.nba_team_codes = [
             'ATL', 'BOS', 'BKN', 'CHA', 'CHO', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GSW', 
             'HOU', 'IND', 'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NOP', 'NYK', 
@@ -486,6 +607,7 @@ class Performer():
         # Example input (batch size of 2 for demonstration)
         # Each input tensor has the shape (batch_size, 7, 4)
         
+        #set up example input by assinging players to the necessary team
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
@@ -510,10 +632,13 @@ class Performer():
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+        #export model
         torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
         }, 'model.pth')
+    
+    #show performance of the model without training it further
     def performModelNoUpdate(self):
         s = statHandler(self.year)
         players = s.calculateTopPlayers(True)
@@ -532,6 +657,7 @@ class Performer():
         # Example input (batch size of 2 for demonstration)
         # Each input tensor has the shape (batch_size, 7, 4)
         
+        #set up example input
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
@@ -555,6 +681,8 @@ class Performer():
             loss = criterion(output, example_target)
             print(f'Loss: {loss.item()}')
             print()
+    
+    #train model for x epochs
     def trainForEpochs(epochs):
         for e in range(0, epochs):
             for i in range(1980, 2024):
@@ -565,7 +693,7 @@ class Performer():
                 val = int(5 * e / (epochs / 20))
                 if (val > 0):
                     print(str(val)+ '%...')
-Performer.trainForEpochs(100)
+Performer.trainForEpochs(60)
 p = Performer("2024")
 p.performModelNoUpdate()
 
