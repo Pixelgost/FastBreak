@@ -41,7 +41,7 @@ const TeamTable = ({ data }) => {
         <tbody>
             {sortedData.map((row, index) => (
             <tr key={index}>
-                <td>{index}</td>
+                <td>{index + 1}</td>
                 <td>{row.team}</td>
                 <td>{row.predicted_win_rate}</td>
                 <td>{row.actual_win_rate}</td>

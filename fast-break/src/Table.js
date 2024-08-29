@@ -44,7 +44,7 @@ const Table = ({ data }) => {
         <tbody>
             {sortedData.map((row, index) => (
             <tr key={index}>
-                <td>{index}</td>
+                <td>{index + 1}</td>
                 <td>{row.name}</td>
                 <td>{row.team}</td>
                 {yearSet.size > 1 && <td>{row.year}</td>}
