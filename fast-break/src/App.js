@@ -49,7 +49,7 @@ const App = () => {
       We find the efficiency and volume for each player in each of those stats, then find the z-score of those statistics and plug it into the aforementioned 
       formula to obtain their rating. Standardizing these statistics helps us compare these players to an 'average player'.</p>
       <p className="Tex">
-      Vorp is calculated using a formula of those statistics. Standardized vorp represents how many standard deviations in vorp a player is from the average.
+      Vorp, or value over replacement player, represents how many standard deviations of value a player is from the average. This is calculated by combinging the other four statistics
       Therefore, a standardized vorp of 0 is an average player, while a score of 4 means you are four standard deviations from the average player.
       </p>
       <p className="Tex">

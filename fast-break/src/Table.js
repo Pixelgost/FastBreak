@@ -32,8 +32,7 @@ const Table = ({ data }) => {
             <th onClick={() => requestSort('playmaking')}>Playmaking</th>
             <th onClick={() => requestSort('rebounding')}>Rebounding</th>
             <th onClick={() => requestSort('defense')}>Defense</th>
-            <th onClick={() => requestSort('vorp')}>Vorp</th>
-            <th onClick={() => requestSort('n_vorp')}>Standardized Vorp</th>
+            <th onClick={() => requestSort('n_vorp')}>Vorp</th>
             </tr>
         </thead>
         <tbody>
@@ -44,7 +43,6 @@ const Table = ({ data }) => {
                 <td>{row.playmaking}</td>
                 <td>{row.rebounding}</td>
                 <td>{row.defense}</td>
-                <td>{row.vorp}</td>
                 <td>{row.n_vorp}</td>
             </tr>
             ))}
