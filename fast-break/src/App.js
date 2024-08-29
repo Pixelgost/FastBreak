@@ -33,7 +33,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <h1>FastBreak</h1>
+      <h1>Fast Break</h1>
       <Select
         options={yearOptions}
         onChange={handleYearChange}
