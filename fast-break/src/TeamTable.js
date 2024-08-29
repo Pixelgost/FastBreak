@@ -34,7 +34,7 @@ const TeamTable = ({ data }) => {
             <th onClick={() => requestSort('predicted_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Neural network predicted win rate">Predicted Win Rate</th>
             <th onClick={() => requestSort('actual_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual win rate">Actual Win Rate</th>
             <th onClick={() => requestSort('predicted_wins')} data-tooltip-id="my-tooltip" data-tooltip-content=" Neural Network predicted win count">Predicted Wins</th>
-            <th onClick={() => requestSort('actual_wins')} data-tooltip-id="my-tooltip" data-tooltip-content="How many wins, the team is on track to win by end of the season">Actual Wins</th>
+            <th onClick={() => requestSort('actual_wins')} data-tooltip-id="my-tooltip" data-tooltip-content="How many wins the team is on track to win by end of the season">Actual Wins</th>
             </tr>
         </thead>
         <tbody>
