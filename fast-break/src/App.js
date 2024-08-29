@@ -21,14 +21,26 @@ const App = () => {
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  const years = [...new Set(data.map(item => item.year))]
+  let yearSet = new Set(data.map(item => item.year))
+  yearSet.add('All Time (Worst Players)')
+  yearSet.add('All Time (Best Players)')
+  const years = [...yearSet]
   const yearOptions = years.map(year => ({ value: year, label: year }));
 
   const handleYearChange = (selectedOption) => {
     setYear(selectedOption.value);
   };
 
-  const filteredData = data.filter(item => item.year === year);
+  let prefilteredData = data.filter(item => item.year === year || year === 'All Time (Worst Players)' || year === 'All Time (Best Players)');
+  if (year === 'All Time (Worst Players)'){
+    prefilteredData.sort((a, b) => a.n_vorp - b.n_vorp)
+  } else {
+    prefilteredData.sort((a, b) => b.n_vorp - a.n_vorp)
+  }
+  if (prefilteredData.length > 1000){
+    prefilteredData = prefilteredData.slice(0, 1000)
+  }
+  const filteredData = prefilteredData
   const filteredTeams = teams.filter(item => item.year === year);
 
   return (

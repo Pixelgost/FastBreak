@@ -238,6 +238,7 @@ class statHandler():
                             p.defensive_win_shares = stat_list[8]
                             p.win_shares = stat_list[9]
                             p.defensive_plus_minus = stat_list[10]
+        return self.players
 
 
     #calculate the top scorers
@@ -415,7 +416,6 @@ class statHandler():
 
     #calculate top players
     def calculateTopPlayers(self, pr):
-
         #obtain stats
         self.getStats()
 
@@ -859,7 +859,7 @@ class Performer():
             # Compute loss
             print(self.nba_team_dict[i], output.detach().numpy()[0][0], self.nba_team_wins[self.nba_team_dict[key]])
             data = {
-                "team": self.nba_team_dict[i],
+                "team": self.nba_team_dict[key],
                 "predicted_win_rate": str(round(output.detach().numpy()[0][0], 3)),
                 "actual_win_rate": str(round(self.nba_team_wins[self.nba_team_dict[key]], 3)),
                 "predicted_wins": str(round(82 * output.detach().numpy()[0][0])),
@@ -890,10 +890,15 @@ class Performer():
 player_data = []
 for i in range(1980, 2025):
     s = statHandler(str(i))
+    perf = Performer(str(i))
     players = s.calculateTopPlayers(False)
     for p in players:
+        key = p.team
+        if (key == 'CHA' and i <= 2014):
+                key = 'CHA2005'
         data = {
             "name": p.name,
+            "team": perf.nba_team_dict[key],
             "scoring": round(p.scoring, 4),
             "playmaking": round(p.playmaking, 4),
             "rebounding": round(p.rebounding, 4),
