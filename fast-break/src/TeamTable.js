@@ -30,6 +30,7 @@ const TeamTable = ({ data }) => {
         <table className="table">
         <thead>
             <tr>
+            <th data-tooltip-id="my-tooltip" data-tooltip-content="Index of the Record">Index</th>
             <th onClick={() => requestSort('team')} data-tooltip-id="my-tooltip" data-tooltip-content="Name of the Team">Team Name</th>
             <th onClick={() => requestSort('predicted_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Neural network predicted win rate">Predicted Win Rate</th>
             <th onClick={() => requestSort('actual_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual win rate">Actual Win Rate</th>
@@ -40,6 +41,7 @@ const TeamTable = ({ data }) => {
         <tbody>
             {sortedData.map((row, index) => (
             <tr key={index}>
+                <td>{index}</td>
                 <td>{row.team}</td>
                 <td>{row.predicted_win_rate}</td>
                 <td>{row.actual_win_rate}</td>

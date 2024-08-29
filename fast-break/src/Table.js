@@ -30,6 +30,7 @@ const Table = ({ data }) => {
         <table className="table">
         <thead>
             <tr>
+            <th data-tooltip-id="my-tooltip" data-tooltip-content="Index of the Record">Index</th>
             <th onClick={() => requestSort('name')} data-tooltip-id="my-tooltip" data-tooltip-content="Name of the Player">Name</th>
             <th onClick={() => requestSort('team')} data-tooltip-id="my-tooltip" data-tooltip-content="Team of the Player">Team</th>
             { yearSet.size > 1 && <th onClick={() => requestSort('year')} data-tooltip-id="my-tooltip" data-tooltip-content="Year of the record">Year</th>}
@@ -43,6 +44,7 @@ const Table = ({ data }) => {
         <tbody>
             {sortedData.map((row, index) => (
             <tr key={index}>
+                <td>{index}</td>
                 <td>{row.name}</td>
                 <td>{row.team}</td>
                 {yearSet.size > 1 && <td>{row.year}</td>}
