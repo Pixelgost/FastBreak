@@ -1,0 +1,93 @@
+/* Import Google Font in your HTML or main CSS file */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* Wrapper for scrollable table */
+.table-container {
+  max-height: 600px; /* Adjust based on your design */
+  overflow-y: auto; /* Enable vertical scrolling */
+  border-radius: 10px; /* Match table's rounded corners */
+  border: 1px solid #000000; /* Optional: border around the table container */
+  margin-top: 2%;
+}
+
+/* Apply general styles for the table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif; /* Use the stylish font */
+  color: #333;
+  margin: 0; /* Remove margin inside the container */
+  border-radius: 10px; /* Round the corners */
+  overflow: hidden; /* Ensure the border-radius is visible */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow for elevation */
+}
+
+/* Style the header */
+.table thead th {
+  background-color: #003f6c; /* Lighter navy blue background for the header */
+  color: white;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Hover effect for header cells */
+.table thead th:hover {
+  background-color: #005f8a; /* Even lighter blue on hover */
+}
+
+/* Sort indicator styles */
+.table thead th::after {
+  content: '';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-top-color: white;
+  transition: border-top-color 0.3s;
+}
+
+.table thead th.sorted-ascending::after {
+  border-top-color: #ddd;
+}
+
+.table thead th.sorted-descending::after {
+  border-top-color: #ddd;
+  border-width: 0 5px 5px 5px;
+}
+
+/* Table rows */
+.table tbody tr {
+  transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  /* Ensure smooth transitions */
+}
+
+/* Alternate row colors */
+.table tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Light gray background for even rows */
+}
+
+/* Hover effect for rows */
+.table tbody tr:hover {
+  background-color: #ffebee; /* Light red background on hover */
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3); /* Red glow effect */
+  transform: scale(1.02); /* Slightly scale up to make it pop out */
+}
+
+/* Table cells */
+.table th, .table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Cell glow effect */
+.table td {
+  transition: box-shadow 0.3s;
+}
+
+.table td:hover {
+  background-color: #ffebee; /* Light red background on hover */
+  box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2); /* Red glow effect on hover */
+}

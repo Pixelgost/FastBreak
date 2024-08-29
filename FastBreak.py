@@ -820,6 +820,54 @@ class Performer():
 
         total_loss /= len(example_input)
         return total_loss
+    def getYearPreds(self):
+        s = statHandler(self.year)
+        players = s.calculateTopPlayers(False)
+        # Instantiate the model
+        model = SimpleNN()
+
+        # Define loss function and optimizer
+        optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+        #load trained model
+        checkpoint = torch.load('model.pth')
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+        # Example input (batch size of 2 for demonstration)
+        # Each input tensor has the shape (batch_size, 8, 4)
+        
+        #set up example input
+        example_input = {}
+        for p in players:
+            if (p.team not in self.nba_team_arrs):
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+            elif(len(self.nba_team_arrs[p.team]) < 8):
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+        # Forward pass
+        for a in self.nba_team_arrs:
+            if(len(self.nba_team_arrs[a]) == 8):
+                example_input[a] = self.nba_team_arrs[a]
+        data_arr = []
+        for i in example_input:
+            output = model(torch.tensor(example_input[i]).unsqueeze(0))
+            # Example target (for training purposes)
+            key = i
+            if (key == 'CHA' and int(self.year) <= 2014):
+                key = 'CHA2005'
+            example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[key]])  # Example target labels for classification
+            # Compute loss
+            print(self.nba_team_dict[i], output.detach().numpy()[0][0], self.nba_team_wins[self.nba_team_dict[key]])
+            data = {
+                "team": self.nba_team_dict[i],
+                "predicted_win_rate": str(round(output.detach().numpy()[0][0], 3)),
+                "actual_win_rate": str(round(self.nba_team_wins[self.nba_team_dict[key]], 3)),
+                "predicted_wins": str(int(82 * output.detach().numpy()[0][0])),
+                "actual_wins": str(int(82 * self.nba_team_wins[self.nba_team_dict[key]])),
+                "year": str(self.year)
+            }
+            data_arr.append(data)
+        return data_arr
     #train model for x epochs
     def trainForEpochs(epochs):
         for e in range(0, epochs):
@@ -835,6 +883,7 @@ class Performer():
                     index = random.randint(0, len(test_years) - 1)
                     p = Performer(test_years[index])
                     print("average loss:", p.performModelNoUpdate())
+            
 #sPerformer.trainForEpochs(20)
 #p = Performer("2024")
 #p.showCase()
@@ -856,4 +905,12 @@ for i in range(2010, 2025):
         player_data.append(data)
 with open("players.json", "w") as f:
     json.dump(player_data, f)
+
+teams = []
+for i in range(2020, 2025):
+    perf = Performer(str(i))
+    teams.extend(perf.getYearPreds())
+print(teams)
+with open("teams.json", "w") as f:
+    json.dump(teams, f)
 

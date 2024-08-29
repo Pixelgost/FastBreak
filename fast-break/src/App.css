@@ -1,38 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 .App {
+  text-align: center;
+  background-color: #f0f4f8;
+  font-family: 'Roboto', sans-serif; /* Use the stylish font */
+  color: #333;
+  padding: 20px;
+}
+
+h1 {
+  color: #d32f2f; /* Red color */
+  font-family: 'Roboto', sans-serif; /* Use the stylish font */
+
+}
+
+.Tex {
+  color: #d32f2f; /* Red color */
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Select {
+  margin-bottom: 20px;
 }
+/* Button.css */
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.github-button {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  text-decoration: none;
   color: white;
+  background-color: #000; /* Black background */
+  border-radius: 5px; /* Rounded corners */
+  border: 2px solid #000; /* Border matching background color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+  transition: all 0.3s ease; /* Smooth transition for effects */
 }
 
-.App-link {
-  color: #61dafb;
+/* Glowing and popping effect on hover */
+.github-button:hover {
+  background-color: #333; /* Slightly lighter black */
+  border-color: #444; /* Lighter border on hover */
+  box-shadow: 0 8px 16px rgba(255, 0, 0, 0.6); /* Red glow effect */
+  transform: scale(1.05); /* Slightly scale up */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Optional focus styling for better accessibility */
+.github-button:focus {
+  outline: none;
+  box-shadow: 0 8px 16px rgba(255, 0, 0, 0.6); /* Red glow effect */
 }
+
