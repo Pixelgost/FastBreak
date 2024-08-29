@@ -862,8 +862,8 @@ class Performer():
                 "team": self.nba_team_dict[i],
                 "predicted_win_rate": str(round(output.detach().numpy()[0][0], 3)),
                 "actual_win_rate": str(round(self.nba_team_wins[self.nba_team_dict[key]], 3)),
-                "predicted_wins": str(int(82 * output.detach().numpy()[0][0])),
-                "actual_wins": str(int(82 * self.nba_team_wins[self.nba_team_dict[key]])),
+                "predicted_wins": str(round(82 * output.detach().numpy()[0][0])),
+                "actual_wins": str(round(82 * self.nba_team_wins[self.nba_team_dict[key]])),
                 "year": str(self.year)
             }
             data_arr.append(data)
