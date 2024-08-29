@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import sys
 import matplotlib.pyplot as plt
+import json
 
 class PlayerStats():
     #initalize variables
@@ -834,8 +835,25 @@ class Performer():
                     index = random.randint(0, len(test_years) - 1)
                     p = Performer(test_years[index])
                     print("average loss:", p.performModelNoUpdate())
-Performer.trainForEpochs(20)
-p = Performer("2024")
-p.showCase()
-
+#sPerformer.trainForEpochs(20)
+#p = Performer("2024")
+#p.showCase()
+player_data = []
+for i in range(2010, 2025):
+    s = statHandler(str(i))
+    players = s.calculateTopPlayers(False)
+    for p in players:
+        data = {
+            "name": p.name,
+            "scoring": round(p.scoring, 4),
+            "playmaking": round(p.playmaking, 4),
+            "rebounding": round(p.rebounding, 4),
+            "defense": round(p.defensive_win_share_normalized, 4),
+            "vorp": round(p.vorp, 4),
+            "n_vorp": round(p.normal_vorp, 4),
+            "year": str(i)
+        }
+        player_data.append(data)
+with open("players.json", "w") as f:
+    json.dump(player_data, f)
 
