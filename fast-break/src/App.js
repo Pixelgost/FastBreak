@@ -51,7 +51,10 @@ const App = () => {
       <p className="Tex">
       Vorp is calculated using a formula of those statistics. Standardized vorp represents how many standard deviations in vorp a player is from the average.
       Therefore, a standardized vorp of 0 is an average player, while a score of 4 means you are four standard deviations from the average player.
-      We plug these calculated values into a neural network and predict team rankings.</p>
+      </p>
+      <p className="Tex">
+      We plug the playmaking, scoring, defense, and rebounding statistics into neural network in order to predict team rankings. The neural network operates within a 10% accuracy range
+      </p>
         <a href="https://github.com/Pixelgost/FastBreak" target="_blank" rel="noopener noreferrer" className="github-button">
            Link to Github Repository
         </a>
