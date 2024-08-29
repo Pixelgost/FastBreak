@@ -428,7 +428,7 @@ class statHandler():
         for p in self.players:
             vorpArr.append(p.calcVorp())
         #filter out the blank stats
-        vorpArr = [i for i in vorpArr if i is not None]
+        vorpArr = [i for i in vorpArr if i is not None and i > -9000]
 
         #sort from best to worst player
         self.players.sort(key=lambda x: x.vorp, reverse=True)
@@ -834,9 +834,8 @@ class Performer():
                     index = random.randint(0, len(test_years) - 1)
                     p = Performer(test_years[index])
                     print("average loss:", p.performModelNoUpdate())
-#Performer.trainForEpochs(20)
-for i in range(2010, 2024):
-    p = Performer(str(i))
-    p.showCase()
+Performer.trainForEpochs(20)
+p = statHandler("2023")
+p.calculateTopPlayers(True)
 
 
