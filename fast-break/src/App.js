@@ -50,7 +50,7 @@ const App = () => {
       formula to obtain their rating. Standardizing these statistics helps us compare these players to an 'average player'.</p>
       <p className="Tex">
       Vorp, or value over replacement player, represents how many standard deviations of value a player is from the average. This is calculated by combinging the other four statistics
-      Therefore, a standardized vorp of 0 is an average player, while a score of 4 means you are four standard deviations from the average player.
+      Therefore, a vorp of 0 is an average player, while a score of 4 means you are four standard deviations from the average player.
       </p>
       <p className="Tex">
       We plug the playmaking, scoring, defense, and rebounding statistics into neural network in order to predict team rankings. The neural network operates within a 10% accuracy range
