@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './Table.css';  // Add custom styles here
+import { Tooltip} from 'react-tooltip';
+
 
 const Table = ({ data }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'team', direction: 'ascending' });
@@ -27,12 +29,12 @@ const Table = ({ data }) => {
         <table className="table">
         <thead>
             <tr>
-            <th onClick={() => requestSort('name')}>Name</th>
-            <th onClick={() => requestSort('scoring')}>Scoring</th>
-            <th onClick={() => requestSort('playmaking')}>Playmaking</th>
-            <th onClick={() => requestSort('rebounding')}>Rebounding</th>
-            <th onClick={() => requestSort('defense')}>Defense</th>
-            <th onClick={() => requestSort('n_vorp')}>Vorp</th>
+            <th onClick={() => requestSort('name')} data-tooltip-id="my-tooltip" data-tooltip-content="Name of the Player">Name</th>
+            <th onClick={() => requestSort('scoring')} data-tooltip-id="my-tooltip" data-tooltip-content="Scoring rating of the player, max is 1.0">Scoring</th>
+            <th onClick={() => requestSort('playmaking')} data-tooltip-id="my-tooltip" data-tooltip-content="Playmaking rating of the player, max is 1.0">Playmaking</th>
+            <th onClick={() => requestSort('rebounding')} data-tooltip-id="my-tooltip" data-tooltip-content="Rebounding rating of the player, max is 1.0">Rebounding</th>
+            <th onClick={() => requestSort('defense')} data-tooltip-id="my-tooltip" data-tooltip-content="Defensive rating of the player, max is 1.0">Defense</th>
+            <th onClick={() => requestSort('n_vorp')} data-tooltip-id="my-tooltip" data-tooltip-content="Value over replacement player, average player has a score of 0">Vorp</th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +50,8 @@ const Table = ({ data }) => {
             ))}
         </tbody>
         </table>
+        <Tooltip id="my-tooltip" />
+
     </div>
   );
 };

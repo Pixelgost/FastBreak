@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Table.css';  // Add custom styles here
-
+import { Tooltip } from 'react-tooltip';
 const TeamTable = ({ data }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'team', direction: 'ascending' });
 
@@ -30,11 +30,11 @@ const TeamTable = ({ data }) => {
         <table className="table">
         <thead>
             <tr>
-            <th onClick={() => requestSort('team')}>Team Name</th>
-            <th onClick={() => requestSort('predicted_win_rate')}>Predicted Win Rate</th>
-            <th onClick={() => requestSort('actual_win_rate')}>Actual Win Rate</th>
-            <th onClick={() => requestSort('predicted_wins')}>Predicted Wins</th>
-            <th onClick={() => requestSort('actual_wins')}>Actual Wins</th>
+            <th onClick={() => requestSort('team')} data-tooltip-id="my-tooltip" data-tooltip-content="Name of the Team">Team Name</th>
+            <th onClick={() => requestSort('predicted_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Neural network predicted win rate">Predicted Win Rate</th>
+            <th onClick={() => requestSort('actual_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual win rate">Actual Win Rate</th>
+            <th onClick={() => requestSort('predicted_wins')} data-tooltip-id="my-tooltip" data-tooltip-content=" Neural Network predicted win count">Predicted Wins</th>
+            <th onClick={() => requestSort('actual_wins')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual win count">Actual Wins</th>
             </tr>
         </thead>
         <tbody>
@@ -49,6 +49,7 @@ const TeamTable = ({ data }) => {
             ))}
         </tbody>
         </table>
+        <Tooltip id="my-tooltip" />
       </div>
     }
   </div>
