@@ -55,8 +55,13 @@ const App = () => {
       <p className="Tex">
       We plug the playmaking, scoring, defense, and rebounding statistics into neural network in order to predict team rankings. The neural network operates within a 10% accuracy range
       </p>
+      <div>
         <a href="https://github.com/Pixelgost/FastBreak" target="_blank" rel="noopener noreferrer" className="github-button">
            Link to Github Repository
+        </a>
+       </div>
+        <a href="https://www.basketball-reference.com/" target="_blank" rel="noopener noreferrer" className='italic'>
+           All statistics are pulled from basketball reference
         </a>
     </div>
     
