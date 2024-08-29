@@ -1,7 +1,5 @@
-/* Import Google Font in your HTML or main CSS file */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap');
 
-/* Wrapper for scrollable table */
 .table-container {
   max-height: 600px; /* Adjust based on your design */
   overflow-y: auto; /* Enable vertical scrolling */
@@ -10,11 +8,10 @@
   margin-top: 2%;
 }
 
-/* Apply general styles for the table */
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-family: 'Roboto', sans-serif; /* Use the stylish font */
+  font-family: 'Exo 2', sans-serif; /* Use the stylish font */
   color: #333;
   margin: 0; /* Remove margin inside the container */
   border-radius: 10px; /* Round the corners */
@@ -22,16 +19,14 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow for elevation */
 }
 
-/* Style the header */
 .table thead th {
-  background-color: #003f6c; /* Lighter navy blue background for the header */
+  background-color: #003f6c; 
   color: white;
   cursor: pointer;
   position: relative;
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Hover effect for header cells */
 .table thead th:hover {
   background-color: #005f8a; /* Even lighter blue on hover */
 }
@@ -57,18 +52,14 @@
   border-width: 0 5px 5px 5px;
 }
 
-/* Table rows */
 .table tbody tr {
   transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
-  /* Ensure smooth transitions */
 }
 
-/* Alternate row colors */
 .table tbody tr:nth-child(even) {
   background-color: #f2f2f2; /* Light gray background for even rows */
 }
 
-/* Hover effect for rows */
 .table tbody tr:hover {
   background-color: #ffebee; /* Light red background on hover */
   box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3); /* Red glow effect */
