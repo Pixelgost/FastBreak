@@ -743,7 +743,7 @@ class Performer():
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
         # Example input (batch size of 2 for demonstration)
-        # Each input tensor has the shape (batch_size, 7, 4)
+        # Each input tensor has the shape (batch_size, 8, 4)
         
         #set up example input
         example_input = {}
@@ -835,7 +835,7 @@ class Performer():
                     p = Performer(test_years[index])
                     print("average loss:", p.performModelNoUpdate())
 Performer.trainForEpochs(20)
-p = statHandler("2023")
-p.calculateTopPlayers(True)
+p = Performer("2024")
+p.showCase()
 
 
