@@ -888,7 +888,7 @@ class Performer():
 #p = Performer("2024")
 #p.showCase()
 player_data = []
-for i in range(2010, 2025):
+for i in range(2000, 2025):
     s = statHandler(str(i))
     players = s.calculateTopPlayers(False)
     for p in players:
