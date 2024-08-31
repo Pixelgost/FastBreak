@@ -56,10 +56,10 @@ const App = () => {
       <p className="Tex">FastBreak is a statistical analysis tool that ranks players and teams based on their attributes.
       There are four major attributes to a player's prowess: playmaking, rebounding, scoring, and defense.</p>
       <p className="Tex">
-      The maximum in any of these statistics is 1.0, meaning the best player has a rating of 1, while everyone else has a fraction of the best player.
+      The average in any of these statistics is 0.0, meaning an average player has a rating of 0, the score is a representation of how many standard deviations away form the average a player is.
       These statistics, excluding defense, follow a simple formula: efficiency + (1.5 * volume). 
       We find the efficiency and volume for each player in each of those stats, then find the z-score of those statistics and plug it into the aforementioned 
-      formula to obtain their rating. Standardizing these statistics helps us compare these players to an 'average player'.</p>
+      formula to obtain their rating.</p>
       <p className="Tex">
       Vorp, or value over replacement player, represents how many standard deviations of value a player is from the average. This is calculated by combinging the other four statistics
       Therefore, a vorp of 0 is an average player, while a score of 4 means you are four standard deviations from the average player.

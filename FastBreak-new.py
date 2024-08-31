@@ -600,8 +600,8 @@ class Performer():
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
         #load trained model
-        if Path("model.pth").is_file():
-            checkpoint = torch.load('model.pth')
+        if Path("model2.pth").is_file():
+            checkpoint = torch.load('model2.pth')
             model.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -637,7 +637,7 @@ class Performer():
         torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-        }, 'model.pth')
+        }, 'model2.pth')
     
     #show performance of the model without training it further
     def performModelNoUpdate(self):
@@ -651,7 +651,7 @@ class Performer():
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
         #load trained model
-        checkpoint = torch.load('model.pth')
+        checkpoint = torch.load('model2.pth')
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -693,7 +693,7 @@ class Performer():
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
         #load trained model
-        checkpoint = torch.load('model.pth')
+        checkpoint = torch.load('model2.pth')
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -732,7 +732,7 @@ class Performer():
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
         #load trained model
-        checkpoint = torch.load('model.pth')
+        checkpoint = torch.load('model2.pth')
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -823,7 +823,7 @@ class Performer():
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
         #load trained model
-        checkpoint = torch.load('model.pth')
+        checkpoint = torch.load('model2.pth')
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -876,39 +876,7 @@ class Performer():
                     p = Performer(test_years[index])
                     print(test_years[index], "average accuracy:", p.performModelNoUpdate())
             
-#Performer.trainForEpochs(20)
-#p = Performer("2024")
-#p.showCase()
-
-player_data = []
-for i in range(1980, 2025):
-    s = statHandler(str(i))
-    perf = Performer(str(i))
-    players = s.calculateTopPlayers(False)
-    for p in players:
-        key = p.team
-        if (key == 'CHA' and i <= 2014):
-                key = 'CHA2005'
-        data = {
-            "name": p.name,
-            "team": perf.nba_team_dict[key],
-            "scoring": round(p.scoring, 4),
-            "playmaking": round(p.playmaking, 4),
-            "rebounding": round(p.rebounding, 4),
-            "defense": round(p.defensive_win_share_normalized, 4),
-            "vorp": round(p.vorp, 4),
-            "n_vorp": round(p.normal_vorp, 4),
-            "year": str(i)
-        }
-        player_data.append(data)
-with open("players.json", "w") as f:
-    json.dump(player_data, f)
-
-teams = []
-for i in range(2020, 2025):
-    perf = Performer(str(i))
-    teams.extend(perf.getYearPreds())
-print(teams)
-with open("teams.json", "w") as f:
-    json.dump(teams, f)
+Performer.trainForEpochs(20)
+p = Performer("2024")
+p.showCase()
 
