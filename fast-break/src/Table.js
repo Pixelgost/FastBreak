@@ -34,9 +34,9 @@ const Table = ({ data }) => {
             <th onClick={() => requestSort('name')} data-tooltip-id="my-tooltip" data-tooltip-content="Name of the Player">Name</th>
             <th onClick={() => requestSort('team')} data-tooltip-id="my-tooltip" data-tooltip-content="Team of the Player">Team</th>
             { yearSet.size > 1 && <th onClick={() => requestSort('year')} data-tooltip-id="my-tooltip" data-tooltip-content="Year of the record">Year</th>}
-            <th onClick={() => requestSort('scoring')} data-tooltip-id="my-tooltip" data-tooltip-content="Scoring rating of the player, verage player has a score of 0">Scoring</th>
-            <th onClick={() => requestSort('playmaking')} data-tooltip-id="my-tooltip" data-tooltip-content="Playmaking rating of the player, verage player has a score of 0">Playmaking</th>
-            <th onClick={() => requestSort('rebounding')} data-tooltip-id="my-tooltip" data-tooltip-content="Rebounding rating of the player, verage player has a score of 0">Rebounding</th>
+            <th onClick={() => requestSort('scoring')} data-tooltip-id="my-tooltip" data-tooltip-content="Scoring rating of the player, average player has a score of 0">Scoring</th>
+            <th onClick={() => requestSort('playmaking')} data-tooltip-id="my-tooltip" data-tooltip-content="Playmaking rating of the player, average player has a score of 0">Playmaking</th>
+            <th onClick={() => requestSort('rebounding')} data-tooltip-id="my-tooltip" data-tooltip-content="Rebounding rating of the player, average player has a score of 0">Rebounding</th>
             <th onClick={() => requestSort('defense')} data-tooltip-id="my-tooltip" data-tooltip-content="Defensive rating of the player, average player has a score of 0">Defense</th>
             <th onClick={() => requestSort('n_vorp')} data-tooltip-id="my-tooltip" data-tooltip-content="Value over replacement player, average player has a score of 0">Vorp</th>
             </tr>
