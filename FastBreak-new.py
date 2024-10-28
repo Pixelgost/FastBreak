@@ -122,27 +122,26 @@ class statHandler():
     def getStats(self):
         #Get stats from the 'totals' sections (Season total stats)
         html = open(self.year+"total.html", "r").read()
-
+        f = open("ouput_2025.txt", "w")
         #split table by columns and rows to get elements
         player_stats = html.split("</tr>")
         for i in player_stats:
             stats = i.split("</td>")
-
             #make sure entry is from the necessary table
-            if (len(stats) == 30):
+            print(len(stats))
+            if (len(stats) >= 30):
                 stat_list = []
                 for j in stats:
 
                     #isolate stat name (x), and stat value (y)
                     x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
                     y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
-
                     #filter values that are invalid
                     for z in y:
                         c = z[1:]
                         if (c != '\n'):
                             stat_list.append(c)
-
+                f.write(str(len(stat_list)) + '\n')
                 #if all stats are found, and they have a team (not total stat), add it to list
                 if(len(stat_list) < 30 or stat_list[4] == 'TOT'):
                     continue
@@ -875,8 +874,9 @@ class Performer():
                     index = random.randint(0, len(test_years) - 1)
                     p = Performer(test_years[index])
                     print(test_years[index], "average accuracy:", p.performModelNoUpdate())
-            
-Performer.trainForEpochs(20)
+          
+#Performer.trainForEpochs(20)
+statHandler.saveData("2024")
 p = Performer("2024")
 p.showCase()
 

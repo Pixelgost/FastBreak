@@ -879,9 +879,9 @@ class Performer():
 #Performer.trainForEpochs(20)
 #p = Performer("2024")
 #p.showCase()
-
+statHandler.saveData("2025")
 player_data = []
-for i in range(1980, 2025):
+for i in range(1980, 2026):
     s = statHandler(str(i))
     perf = Performer(str(i))
     players = s.calculateTopPlayers(False)
@@ -905,7 +905,7 @@ with open("players.json", "w") as f:
     json.dump(player_data, f)
 
 teams = []
-for i in range(2020, 2025):
+for i in range(2020, 2026):
     perf = Performer(str(i))
     teams.extend(perf.getYearPreds())
 print(teams)
