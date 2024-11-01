@@ -136,12 +136,15 @@ class statHandler():
                     #isolate stat name (x), and stat value (y)
                     x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
                     y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
+                    for name in x:
+                        f.write(name + '\n')
+
                     #filter values that are invalid
                     for z in y:
                         c = z[1:]
                         if (c != '\n'):
                             stat_list.append(c)
-                f.write(str(len(stat_list)) + '\n')
+                f.write("\n ")
                 #if all stats are found, and they have a team (not total stat), add it to list
                 if(len(stat_list) < 30 or stat_list[4] == 'TOT'):
                     continue
@@ -876,7 +879,7 @@ class Performer():
                     print(test_years[index], "average accuracy:", p.performModelNoUpdate())
           
 #Performer.trainForEpochs(20)
-statHandler.saveData("2024")
-p = Performer("2024")
+#statHandler.saveData("2024")
+p = Performer("2022")
 p.showCase()
 

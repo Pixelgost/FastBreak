@@ -10,6 +10,8 @@ from pathlib import Path
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from bs4 import BeautifulSoup, Comment
+import re
 import sys
 import matplotlib.pyplot as plt
 import json
@@ -19,9 +21,9 @@ class PlayerStats():
     def __init__(self, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, bb, cc, dd, ee):
         self.id = a
         self.name = b
-        self.position = c
-        self.age = d
-        self.team = e
+        self.age = c
+        self.team = d
+        self.position = e
         self.games_played = f
         self.games_started = g
         self.minutes = h
@@ -48,18 +50,18 @@ class PlayerStats():
         self.personal_fouls = cc
         self.points = dd
         self.year = ee
-        self.defensive_win_shares = 'N/A'
-        self.win_shares = 'N/A'
-        self.defensive_plus_minus = 'N/A'
-        self.fg_add = 'N/A'
-        self.ts_add = 'N/A'
-        self.usage_percentage = 'N/A'
-        self.assist_rate = 'N/A'
-        self.steal_rate = 'N/A'
-        self.block_rate = 'N/A'
-        self.rebound_rate = 'N/A'
-        self.turnover_rate = 'N/A'
-        self.assist_share = 'N/A'
+        self.defensive_win_shares = None
+        self.win_shares = None
+        self.defensive_plus_minus = None
+        self.fg_add = None
+        self.ts_add = None
+        self.usage_percentage = None
+        self.assist_rate = None
+        self.steal_rate = None
+        self.block_rate = None
+        self.rebound_rate = None
+        self.turnover_rate = None
+        self.assist_share = None
         self.normal_ts = None
         self.shot_volume = None
         self.normal_assist = None
@@ -122,122 +124,85 @@ class statHandler():
     def getStats(self):
         #Get stats from the 'totals' sections (Season total stats)
         html = open(self.year+"total.html", "r").read()
-
-        #split table by columns and rows to get elements
-        player_stats = html.split("</tr>")
-        for i in player_stats:
-            stats = i.split("</td>")
-
-            #make sure entry is from the necessary table
-            if (len(stats) == 30):
-                stat_list = []
-                for j in stats:
-
-                    #isolate stat name (x), and stat value (y)
-                    x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
-                    y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
-
-                    #filter values that are invalid
-                    for z in y:
-                        c = z[1:]
-                        if (c != '\n'):
-                            stat_list.append(c)
-
-                #if all stats are found, and they have a team (not total stat), add it to list
-                if(len(stat_list) < 30 or stat_list[4] == 'TOT'):
+        soup = BeautifulSoup(html,"html.parser")
+        table = soup.find("table", id="totals_stats")
+        id_counter = 0
+        for row in table.find_all("tr"):
+            # Get each cell in the row
+            cells = row.find_all("td")
+            
+            # If there are cells (to skip header rows, etc.)
+            if cells:
+                data = [cell.text.strip() for cell in cells]  # Get cell text
+                stat_list = data
+                for i in range(len(stat_list)):
+                    if stat_list[i] == '':
+                        stat_list[i] = None
+                    elif stat_list[i][len(stat_list[i]) - 1] == '*':
+                        stat_list[i] = stat_list[i][:len(stat_list[i])-1]
+                if (stat_list[2] == None or stat_list[2][1:] == 'TM'):
                     continue
-                #
-                self.players.append(PlayerStats(stat_list[0], stat_list[1], stat_list[2], stat_list[3], stat_list[4], stat_list[5], stat_list[6], stat_list[7], stat_list[8], 
+                self.players.append(PlayerStats(id_counter, stat_list[0], stat_list[1], stat_list[2], stat_list[3], stat_list[4], stat_list[5], stat_list[6], stat_list[7], stat_list[8], 
                                         stat_list[9], stat_list[10], stat_list[11], stat_list[12], stat_list[13], stat_list[14], stat_list[15], 
                                             stat_list[16], stat_list[17], stat_list[18], stat_list[19], stat_list[20], stat_list[21], stat_list[22], stat_list[23], stat_list[24], 
-                                            stat_list[25], stat_list[26], stat_list[27], stat_list[28], stat_list[29], self.year))
+                                            stat_list[25], stat_list[26], stat_list[27], stat_list[28], self.year))
+                id_counter +=1
                 
         #get the stats for precise shooting
-        html = open(self.year+"shooting.html", "r").read()
-
-        #split table by column and row to get elements
-        player_stats = html.split("</tr>")
-        for ii in range(0, len(player_stats)):
-            i = player_stats[ii]
-            stats = i.split("</td>")
-
-            #check if the table is correct
-            if(len(stats) == 28):
-                stat_list = []
-                for j in stats:
-
-                    #get stat name (x), and stat value (y)
-                    x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
-                    y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
-
-                    #check if the stat is one we need
-                    if (len(x) > 0):
-                        if (x[0][11:len(x[0]) - 1] == 'fg_pts_added' 
-                            or x[0][11:len(x[0]) - 1] == 'ts_pts_added' 
-                            or x[0][11:len(x[0]) - 1] == 'team'):
-                            if(len(y) > 0):
-                                stat_list.append(y[0][1:])
-                        elif(x[0][11:len(x[0]) - 1] == 'ranker'):
-                            if(len(y) > 1):
-                                stat_list.append(y[1][1:])
-                    
-                #if all stats are present add it to the correct player
-                if(len(stat_list) == 4):
-                    for p in self.players:
-                        if(p.name == stat_list[0] and p.team == stat_list[1]):
-                            p.ts_add = stat_list[3]
-                            p.fg_add = stat_list[2]
-        
+        html = open(self.year+"shooting.html", "r", encoding="utf-8").read()
+        # Remove unclosed comments
+        html = re.sub("<!--\n", "\n", html)
+        soup = BeautifulSoup(html,"html.parser")
+        table = soup.find("table", id="adj-shooting")
+        for row in table.find_all("tr"):
+            # Get each cell in the row
+            cells = row.find_all("td")
+            # If there are cells (to skip header rows, etc.)
+            if cells:
+                data = [cell.text.strip() for cell in cells]  # Get cell text
+                stat_list = data
+                for i in range(len(stat_list)):
+                    if stat_list[i] == '':
+                        stat_list[i] = None
+                    elif stat_list[i][len(stat_list[i]) - 1] == '*':
+                        stat_list[i] = stat_list[i][:len(stat_list[i])-1]
+                if (stat_list[3] == None or stat_list[3][1:] == 'TM'):
+                    continue
+                for p in self.players:
+                        if(p.name == stat_list[0] and p.team == stat_list[3]):
+                            p.fg_add = stat_list[len(stat_list) - 2]
+                            p.ts_add = stat_list[len(stat_list) - 1]
         #get advanced stats
         html = open(self.year+"advanced.html", "r").read()
-
-        #split table by columns and rows into elements
-        player_stats = html.split("</tr>")
-        for ii in range(0, len(player_stats)):
-            i = player_stats[ii]
-            stats = i.split("</td>")
-
-            #check if we are in the correct table
-            if(len(stats) == 29):
-                stat_list = []
-
-                for j in stats:
-
-                    #isolate the stat name (x) and stat value (y)
-                    x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
-                    y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
-
-                    #if the stat is one we need, add it to the list
-                    if (len(x) > 0):
-                        if (x[0][11:len(x[0]) - 1] == 'ast_pct'
-                            or x[0][11:len(x[0]) - 1] == 'blk_pct'
-                            or x[0][11:len(x[0]) - 1] == 'stl_pct'
-                            or x[0][11:len(x[0]) - 1] == 'trb_pct'
-                            or x[0][11:len(x[0]) - 1] == 'tov_pct'
-                            or x[0][11:len(x[0]) - 1] == 'usg_pct'
-                            or x[0][11:len(x[0]) - 1] == 'dbpm'
-                            or x[0][11:len(x[0]) - 1] == 'dws'
-                            or x[0][11:len(x[0]) - 1] == 'ws'
-                            or x[0][11:len(x[0]) - 1] == 'team_id'):
-                            if(len(y) > 0):
-                                stat_list.append(y[0][1:])
-                        elif(x[0][11:len(x[0]) - 1] == 'ranker'):
-                            if(len(y) > 1):
-                                stat_list.append(y[1][1:])
-
-                #if the all stats are found, add it to the appropirate player
-                if(len(stat_list) == 11):
-                    for p in self.players:
-                        if(p.name == stat_list[0] and p.team == stat_list[1]):
-                            p.rebound_rate = stat_list[2]
-                            p.assist_rate = stat_list[3]
-                            p.steal_rate = stat_list[4]
-                            p.block_rate = stat_list[5]
-                            p.turnover_rate = stat_list[6]
-                            p.usage_percentage = stat_list[7]
-                            p.defensive_win_shares = stat_list[8]
-                            p.win_shares = stat_list[9]
-                            p.defensive_plus_minus = stat_list[10]
+        soup = BeautifulSoup(html,"html.parser")
+        table = soup.find("table", id="advanced_stats")
+        id_counter = 0
+        for row in table.find_all("tr"):
+            # Get each cell in the row
+            cells = row.find_all("td")
+            # If there are cells (to skip header rows, etc.)
+            if cells:
+                data = [cell.text.strip() for cell in cells]  # Get cell text
+                stat_list = data
+                for i in range(len(stat_list)):
+                    if stat_list[i] == '':
+                        stat_list[i] = None
+                    elif stat_list[i][len(stat_list[i]) - 1] == '*':
+                        stat_list[i] = stat_list[i][:len(stat_list[i])-1]
+                if (stat_list[3] == None or stat_list[3][1:] == 'TM'):
+                    continue
+                for p in self.players:
+                        if(p.name == stat_list[0] and p.team == stat_list[3]):
+                            p.rebound_rate = stat_list[12]
+                            p.assist_rate = stat_list[13]
+                            p.steal_rate = stat_list[14]
+                            p.block_rate = stat_list[15]
+                            p.turnover_rate = stat_list[16]
+                            p.usage_percentage = stat_list[17]
+                            p.defensive_win_shares = stat_list[20]
+                            p.win_shares = stat_list[21]
+                            p.defensive_plus_minus = stat_list[25]
+        
         return self.players
 
 
@@ -247,7 +212,7 @@ class statHandler():
         
         #transform the 'points added by true shooting above average' stat, into a z-score
         for p in self.players:
-            if(p.ts_add != 'N/A'):
+            if(p.ts_add != None):
                 ts_add_arr.append(float(p.ts_add))
 
         #obtain the mean and standard deviation of the stat
@@ -255,20 +220,25 @@ class statHandler():
 
         #normalize it
         for p in self.players:
-            if(p.ts_add != 'N/A'):
+            if(p.ts_add != None):
                 p.normal_ts = (float(p.ts_add) - mean) / std
 
         #calculate the volume statistic for scoring
         shot_volume_arr = []
         for p in self.players:
-            p.shot_volume = int(p.field_goals_attempted) + (0.44 * int(p.free_throws_attempted))
-            shot_volume_arr.append(p.shot_volume)
+            if (p.field_goals_attempted != None and p.free_throws_attempted != None):
+                p.shot_volume = int(p.field_goals_attempted) + (0.44 * int(p.free_throws_attempted))
+                shot_volume_arr.append(p.shot_volume)
+            else:
+                p.shot_volume = None
 
         #find the mean and standard deviation and then normalize
         mean, std = np.mean(shot_volume_arr), np.std(shot_volume_arr)
         for p in self.players:
-            p.normal_shot_volume = (float(p.shot_volume) - mean) / std
-        
+            if (p.shot_volume != None):
+                p.normal_shot_volume = (float(p.shot_volume) - mean) / std
+            else:
+                p.normal_shot_volume = None
         #calculate scoring
         score_arr = []
         for p in self.players:
@@ -294,7 +264,7 @@ class statHandler():
 
         #calculate assist rates
         for p in self.players:
-            if(p.assist_rate == 'N/A' or p.turnover_rate == 'N/A' or p.usage_percentage == 'N/A'):
+            if(p.assist_rate == None or p.turnover_rate == None or p.usage_percentage == None):
                 continue
             assist_rate = (float(p.assist_rate) - float(p.turnover_rate)) / float(p.usage_percentage)
             rates_arr.append(assist_rate)
@@ -313,13 +283,17 @@ class statHandler():
 
         #find mean and standard dev of the volume of assists
         for p in self.players:
-            volume_arr.append(int(p.assists))
+            if (p.assists != None):
+                volume_arr.append(int(p.assists))
         mean, std = np.mean(volume_arr), np.std(volume_arr)
 
         #normalize the assist volume
         for p in self.players:
-            p.normal_assist_volume = (int(p.assists) - mean) / std
-        
+            if (p.assists != None):
+                p.normal_assist_volume = (int(p.assists) - mean) / std
+            else:
+                p.normal_assist_volume = None
+
         playmaking_arr = []
         #calculate playmaking score
         for p in self.players:
@@ -344,7 +318,7 @@ class statHandler():
         reb_rates = []
 
         for p in self.players:
-            if (p.rebound_rate == 'N/A'):
+            if (p.rebound_rate == None):
                 continue
             reb_rates.append(float(p.rebound_rate))
 
@@ -353,21 +327,24 @@ class statHandler():
 
         #normalize the rates
         for p in self.players:
-            if (p.rebound_rate == 'N/A'):
+            if (p.rebound_rate == None):
                 continue
             p.normal_rebounds = (float(p.rebound_rate) - mean) / std
 
         off_rebs, def_rebs = [], []
-
+        
         #find mean and standard dev of the two volume metrics
         for p in self.players:
-            off_rebs.append(int(p.offensive_rebounds))
-            def_rebs.append(int(p.defensive_rebounds))
+            if (p.offensive_rebounds != None):
+                    off_rebs.append(int(p.offensive_rebounds))
+            if (p.defensive_rebounds != None):
+                def_rebs.append(int(p.defensive_rebounds))
         off_mean, off_std, def_mean, def_std = np.mean(off_rebs), np.std(off_rebs), np.mean(def_rebs), np.std(def_rebs)
 
         #normalize the volume metrics and combine them
         for p in self.players:
-            p.normal_rebounds_volume = 0.5 * (((int(p.offensive_rebounds) - off_mean) / off_std) + ((int(p.defensive_rebounds) - def_mean) / def_std))
+            if (p.offensive_rebounds != None and p.defensive_rebounds != None):
+                p.normal_rebounds_volume = 0.5 * (((int(p.offensive_rebounds) - off_mean) / off_std) + ((int(p.defensive_rebounds) - def_mean) / def_std))
         
         rebound_arr = []
         #calculate top rebounders
@@ -392,10 +369,10 @@ class statHandler():
 
         defense_arr = []
         for p in self.players:
-            defense_arr += [float(p.defensive_win_shares)] if p.defensive_win_shares != 'N/A' else []
+            defense_arr += [float(p.defensive_win_shares)] if p.defensive_win_shares != None else []
         mean, std = np.mean(defense_arr), np.std(defense_arr)
         for p in self.players:
-            p.defensive_win_share_normalized = ((float(p.defensive_win_shares) - mean) / std) if p.defensive_win_shares != 'N/A' else -sys.maxsize - 1
+            p.defensive_win_share_normalized = ((float(p.defensive_win_shares) - mean) / std) if p.defensive_win_shares != None else -sys.maxsize - 1
         
         #sort by best to worst defender
         self.players.sort(key=lambda x: x.defensive_win_share_normalized, reverse=True)
@@ -419,6 +396,7 @@ class statHandler():
         self.calculateTopRebounders(pr)
         self.calculateTopDefenders(pr)
         vorpArr = []
+        print(len(self.players))
         #calculate VORP for each player
         for p in self.players:
             vorpArr.append(p.calcVorp())
@@ -474,34 +452,23 @@ class statHandler():
     def getYearStats(year):
         #read proper file
         html = open(year+"teams.html", "r").read()
+        soup = BeautifulSoup(html,"html.parser")
+        table = soup.find("table", id="ratings")
         nba_dict = {}
 
-        #split table by rows and columns
-        player_stats = html.split("</tr>")
-        for i in player_stats:
-            stats = i.split("</td>")
-
-            #make sure we are in the right table
-            if(len(stats) == 15):
-                stat_list = []
-
-                for j in stats:
-                    #isolate stat names(x) and stat value (y)
-                    x = re.findall("data-stat=\"[a-zA-Z0-9_]+\"", j)
-                    y = re.findall(">[a-z.A-Z0-9\s'-]+", j)
-
-                    #if the stat is win_loss_pct add it to list
-                    if (len(x) > 0):
-                        if (x[0][11:len(x[0]) - 1] == 'win_loss_pct'):
-                            if(len(y) > 0):
-                                stat_list.append(y[0][1:])
-                        elif(len(x) > 1 and x[1][11:len(x[1]) - 1] == 'team_name'):
-                            if(len(y) > 0):
-                                stat_list.append(y[len(y) - 1][1:])
-                
-                #set dictionary entry if stat was found
-                if(len(stat_list) == 2):
-                    nba_dict[stat_list[0]] = float(stat_list[1])
+        for row in table.find_all("tr"):
+            # Get each cell in the row
+            cells = row.find_all("td")
+            # If there are cells (to skip header rows, etc.)
+            if cells:
+                data = [cell.text.strip() for cell in cells]  # Get cell text
+                stat_list = data
+                for i in range(len(stat_list)):
+                    if stat_list[i] == '':
+                        stat_list[i] = None
+                    elif stat_list[i][len(stat_list[i]) - 1] == '*':
+                        stat_list[i] = stat_list[i][:len(stat_list[i])-1]
+                nba_dict[stat_list[0]] = float(stat_list[5])
         return nba_dict
                 
         
@@ -816,6 +783,7 @@ class Performer():
     def getYearPreds(self):
         s = statHandler(self.year)
         players = s.calculateTopPlayers(False)
+        print(s.players)
         # Instantiate the model
         model = SimpleNN()
 
@@ -879,8 +847,9 @@ class Performer():
 #Performer.trainForEpochs(20)
 #p = Performer("2024")
 #p.showCase()
-statHandler.saveData("2025")
 player_data = []
+#for i in range(1980, 2026):
+#    statHandler.saveData(str(i))
 for i in range(1980, 2026):
     s = statHandler(str(i))
     perf = Performer(str(i))
