@@ -475,9 +475,9 @@ class SimpleNN(nn.Module):
     def __init__(self):
         super(SimpleNN, self).__init__()
         # Since we have 8 vectors of 4 elements each, input dimension will be 8 * 4 = 32
-        self.input_dim = 8 * 4
-        self.hidden_dim1 = 64
-        self.hidden_dim2 = 32
+        self.input_dim = 8 * 5
+        self.hidden_dim1 = 80
+        self.hidden_dim2 = 40
         self.output_dim = 1 
 
         # Define the layers
@@ -486,7 +486,7 @@ class SimpleNN(nn.Module):
         self.fc3 = nn.Linear(self.hidden_dim2, self.output_dim)
 
     def forward(self, x):
-        x = x.view(-1, 8 * 4)
+        x = x.view(-1, 8 * 5)
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
         x = self.fc3(x)
@@ -537,7 +537,7 @@ class Performer():
             'VAN': 'Vancouver Grizzlies',
             'CHA2005': 'Charlotte Bobcats',
             'NOH': 'New Orleans Hornets',
-            'NOK': 'New Orleans',
+            'NOK': 'New Orleans/Oklahoma City Hornets',
         }
 
         #full list of 3 letter codes
@@ -578,9 +578,9 @@ class Performer():
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -628,9 +628,9 @@ class Performer():
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -670,9 +670,9 @@ class Performer():
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8 and a == team):
@@ -709,9 +709,9 @@ class Performer():
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -801,9 +801,9 @@ class Performer():
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -843,13 +843,18 @@ class Performer():
                     p = Performer(test_years[index])
                     print(test_years[index], "average accuracy:", p.performModelNoUpdate())
             
-#Performer.trainForEpochs(20)
-#p = Performer("2024")
-#p.showCase()
+Performer.trainForEpochs(20)
+p = Performer("2024")
+p.showCase()
 player_data = []
 #for i in range(2025, 2026):
 #    statHandler.saveData(str(i))
-for i in range(1980, 2026):
+progress = 0
+start_year = 1980
+end_year = 2026
+for i in range(start_year, end_year):
+    
+
     s = statHandler(str(i))
     perf = Performer(str(i))
     players = s.calculateTopPlayers(False)
@@ -870,11 +875,15 @@ for i in range(1980, 2026):
             "year": str(i)
         }
         player_data.append(data)
+        progress += 1.0
+
+    if (progress % 5 == 0):
+        print(f'{1.0 * progress / (end_year - start_year)}% complete...')
 with open("players.json", "w") as f:
     json.dump(player_data, f)
 
 teams = []
-for i in range(2020, 2026):
+for i in range(2020, end_year):
     perf = Performer(str(i))
     teams.extend(perf.getYearPreds())
 print(teams)
