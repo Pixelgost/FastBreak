@@ -396,7 +396,6 @@ class statHandler():
         self.calculateTopRebounders(pr)
         self.calculateTopDefenders(pr)
         vorpArr = []
-        print(len(self.players))
         #calculate VORP for each player
         for p in self.players:
             vorpArr.append(p.calcVorp())
@@ -848,7 +847,7 @@ class Performer():
 #p = Performer("2024")
 #p.showCase()
 player_data = []
-#for i in range(1980, 2026):
+#for i in range(2025, 2026):
 #    statHandler.saveData(str(i))
 for i in range(1980, 2026):
     s = statHandler(str(i))
@@ -867,6 +866,7 @@ for i in range(1980, 2026):
             "defense": round(p.defensive_win_share_normalized, 4),
             "vorp": round(p.vorp, 4),
             "n_vorp": round(p.normal_vorp, 4),
+            "games_played": p.games_played,
             "year": str(i)
         }
         player_data.append(data)
