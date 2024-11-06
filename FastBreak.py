@@ -827,8 +827,8 @@ class Performer():
                 "team": self.nba_team_dict[key],
                 "predicted_win_rate": str(round(output.detach().numpy()[0][0], 3)),
                 "actual_win_rate": str(round(self.nba_team_wins[self.nba_team_dict[key]], 3)),
-                "predicted_wins": str(round(82 * output.detach().numpy()[0][0])),
-                "actual_wins": str(round(82 * self.nba_team_wins[self.nba_team_dict[key]])),
+                "predicted_wins": str(round(max_games_played * output.detach().numpy()[0][0])),
+                "actual_wins": str(round(max_games_played * self.nba_team_wins[self.nba_team_dict[key]])),
                 "year": str(self.year)
             }
             data_arr.append(data)
@@ -849,9 +849,9 @@ class Performer():
                     p = Performer(test_years[index])
                     print(test_years[index], "average accuracy:", p.performModelNoUpdate())
             
-Performer.trainForEpochs(50)
-p = Performer("2024")
-p.showCase()
+#Performer.trainForEpochs(50)
+#p = Performer("2024")
+#p.showCase()
 player_data = []
 #for i in range(2025, 2026):
 #    statHandler.saveData(str(i))
@@ -859,8 +859,6 @@ progress = 0
 start_year = 1980
 end_year = 2026
 for i in range(start_year, end_year):
-    
-
     s = statHandler(str(i))
     perf = Performer(str(i))
     players = s.calculateTopPlayers(False)
@@ -881,10 +879,10 @@ for i in range(start_year, end_year):
             "year": str(i)
         }
         player_data.append(data)
-        progress += 1.0
+    progress += 1.0
 
     if (progress % 5 == 0):
-        print(f'{1.0 * progress / (end_year - start_year)}% complete...')
+        print(f'{100 * (progress / (end_year - start_year))}% complete...')
 with open("players.json", "w") as f:
     json.dump(player_data, f)
 
