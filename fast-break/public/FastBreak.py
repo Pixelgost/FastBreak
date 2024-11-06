@@ -859,6 +859,7 @@ class Performer():
 progress = 0
 start_year = 1980
 end_year = 2026
+'''
 player_data = []
 #for i in range(2025, 2026):
 #    statHandler.saveData(str(i))
@@ -890,6 +891,7 @@ for i in range(start_year, end_year):
         print(f'{100 * (progress / (end_year - start_year))}% complete...')
 with open("players.json", "w") as f:
     json.dump(player_data, f)
+'''
 teams = []
 for i in range(2020, end_year):
     perf = Performer(str(i))
