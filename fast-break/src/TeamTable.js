@@ -33,13 +33,11 @@ const TeamTable = ({ data }) => {
             <th data-tooltip-id="my-tooltip" data-tooltip-content="Index of the Record">Index</th>
             <th onClick={() => requestSort('team')} data-tooltip-id="my-tooltip" data-tooltip-content="Name of the Team">Team Name</th>
             <th onClick={() => requestSort('predicted_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Neural network predicted win rate">Predicted Win Rate</th>
-            <th onClick={() => requestSort('actual_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual win rate">Actual Win Rate</th>
             <th onClick={() => requestSort('predicted_loss_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Neural network predicted loss rate">Predicted Loss Rate</th>
+            <th onClick={() => requestSort('actual_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual win rate">Actual Win Rate</th>
             <th onClick={() => requestSort('actual_loss_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual loss rate">Actual Loss Rate</th>
-            <th onClick={() => requestSort('predicted_wins')} data-tooltip-id="my-tooltip" data-tooltip-content=" Neural Network predicted win count">Predicted Wins</th>
-            <th onClick={() => requestSort('actual_wins')} data-tooltip-id="my-tooltip" data-tooltip-content="How many wins the team has">Actual Wins</th>
-            <th onClick={() => requestSort('predicted_losses')} data-tooltip-id="my-tooltip" data-tooltip-content=" Neural Network predicted loss count">Predicted Losses</th>
-            <th onClick={() => requestSort('actual_losses')} data-tooltip-id="my-tooltip" data-tooltip-content="How many losses the team has">Actual Losses</th>
+            <th onClick={() => requestSort('predicted_record')} data-tooltip-id="my-tooltip" data-tooltip-content=" Neural Network predicted record">Predicted Record</th>
+            <th onClick={() => requestSort('actual_record')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual Record of the Teams">Actual Record</th>
             </tr>
         </thead>
         <tbody>
@@ -48,13 +46,12 @@ const TeamTable = ({ data }) => {
                 <td>{index + 1}</td>
                 <td>{row.team}</td>
                 <td>{row.predicted_win_rate}</td>
-                <td>{row.actual_win_rate}</td>
                 <td>{row.predicted_loss_rate}</td>
+                <td>{row.actual_win_rate}</td>
                 <td>{row.actual_loss_rate}</td>
-                <td>{row.predicted_wins}</td>
-                <td>{row.actual_wins}</td>
-                <td>{row.predicted_losses}</td>
-                <td>{row.actual_losses}</td>
+                <td>{`${row.predicted_wins} - ${row.predicted_losses}`}</td>
+                <td>{`${row.actual_wins} - ${row.actual_losses}`}</td>
+
             </tr>
             ))}
         </tbody>
