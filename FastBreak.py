@@ -575,12 +575,14 @@ class Performer():
         # Each input tensor has the shape (batch_size, 7, 4)
         
         #set up example input by assinging players to the necessary team
+
+        max_games_played = min(max([int(p.games_played) for p in players]), 82)
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -625,12 +627,14 @@ class Performer():
         # Each input tensor has the shape (batch_size, 7, 4)
         
         #set up example input
+        max_games_played = min(max([int(p.games_played) for p in players]), 82)
+
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -644,7 +648,7 @@ class Performer():
                 key = 'CHA2005'
             example_target = torch.full((1, 1), self.nba_team_wins[self.nba_team_dict[key]])  # Example target labels for classification
             # Compute loss
-            total_acc += 1 - ((output.detach().numpy()[0][0] - self.nba_team_wins[self.nba_team_dict[key]]) / self.nba_team_wins[self.nba_team_dict[key]])
+            total_acc += 1 - abs((output.detach().numpy()[0][0] - self.nba_team_wins[self.nba_team_dict[key]]) / self.nba_team_wins[self.nba_team_dict[key]])
         total_acc /= len(example_input)
         return total_acc
 
@@ -667,12 +671,13 @@ class Performer():
         # Each input tensor has the shape (batch_size, 7, 4)
         
         #set up example input
+        max_games_played = min(max([int(p.games_played) for p in players]), 82)
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8 and a == team):
@@ -706,12 +711,13 @@ class Performer():
         # Each input tensor has the shape (batch_size, 8, 4)
         
         #set up example input
+        max_games_played = min(max([int(p.games_played) for p in players]), 82)
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -782,7 +788,6 @@ class Performer():
     def getYearPreds(self):
         s = statHandler(self.year)
         players = s.calculateTopPlayers(False)
-        print(s.players)
         # Instantiate the model
         model = SimpleNN()
 
@@ -798,12 +803,13 @@ class Performer():
         # Each input tensor has the shape (batch_size, 8, 4)
         
         #set up example input
+        max_games_played = min(max([int(p.games_played) for p in players]), 82)
         example_input = {}
         for p in players:
             if (p.team not in self.nba_team_arrs):
-                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32)]
+                self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, p.games_played], dtype=np.float32))
+                self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / max_games_played], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
             if(len(self.nba_team_arrs[a]) == 8):
@@ -843,7 +849,7 @@ class Performer():
                     p = Performer(test_years[index])
                     print(test_years[index], "average accuracy:", p.performModelNoUpdate())
             
-Performer.trainForEpochs(20)
+Performer.trainForEpochs(50)
 p = Performer("2024")
 p.showCase()
 player_data = []
@@ -886,7 +892,6 @@ teams = []
 for i in range(2020, end_year):
     perf = Performer(str(i))
     teams.extend(perf.getYearPreds())
-print(teams)
 with open("teams.json", "w") as f:
     json.dump(teams, f)
 
