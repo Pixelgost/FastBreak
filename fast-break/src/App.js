@@ -75,6 +75,17 @@ const App = () => {
       <p className="Tex">
       We plug the playmaking, scoring, defense, and rebounding statistics into neural network in order to predict team rankings. The neural network operates within a 10% accuracy range
       </p>
+
+      <p className="Tex">
+      You can view a players's improvements over time by clicking on their name, you can also deselect stats you do not want to see.
+      Keep in mind these are in terms of standard deviations so they are comparable over the years
+      </p>
+      <p className="Tex">
+      You can try and predict a team's record by clicking on their name and adjusting their player's stats. 
+      Keep in mind that games played is out of 82 so if we are only halfway through the season, adjust the games played to be all the way through.
+      Also since volume affects a player's score for all stats, if you want to increase a player's games_played also increase their stats to reflect it. A good rule of thumb is 60% of the increase in the games played translates to increase in stats
+      Example: If you want to increase Joel Embiid's games played by doubling it, increase his stats by 60% as well. If you just increase his stats by 1/3, increase his stats by 20%.
+      </p>
       <div>
         <a href="https://github.com/Pixelgost/FastBreak" target="_blank" rel="noopener noreferrer" className="github-button">
            Link to Github Repository
