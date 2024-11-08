@@ -41,7 +41,7 @@ const App = () => {
   if (prefilteredData.length > 1000){
     prefilteredData = prefilteredData.slice(0, 1000)
   }
-  const filteredData = prefilteredData.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase))
+  const filteredData = searchQuery != '' ? prefilteredData.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase)) : prefilteredData
   const filteredTeams = teams.filter(item => item.year === year);
 
   return (
