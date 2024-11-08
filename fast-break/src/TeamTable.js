@@ -198,7 +198,7 @@ const TeamTable = ({ data, playerList }) => {
               const output = await model.run(feeds);
               if (output.output.cpuData.length > 0) {
                 const rate = output.output.cpuData[0]
-                const wins = Math.round(82 * rate)
+                const wins = Math.min(Math.round(82 * rate), 82)
                 const losses = 82 - wins
                 alert(`Predicted Record: ${wins} - ${losses}`)
               } else {
