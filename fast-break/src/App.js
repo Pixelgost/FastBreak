@@ -88,6 +88,9 @@ const App = () => {
       Also since volume affects a player's score for all stats, if you want to increase a player's games_played also increase their stats to reflect it. A good rule of thumb is 60% of the increase in the games played translates to increase in stats
       Example: If you want to increase Joel Embiid's games played by doubling it, increase his stats by 60% as well. If you just increase his stats by 1/3, increase his stats by 20%.
       </p>
+      <p className='Tex'>
+      Currently, the neural network predicts a negative correlation between games played and record, this will be a metter we look into
+      </p>
       <div>
         <a href="https://github.com/Pixelgost/FastBreak" target="_blank" rel="noopener noreferrer" className="github-button">
            Link to Github Repository
