@@ -89,7 +89,7 @@ const App = () => {
       Example: If you want to increase Joel Embiid's games played by doubling it, increase his stats by 60% as well. If you just increase his stats by 1/3, increase his stats by 20%.
       </p>
       <p className='Tex'>
-      Currently, the neural network predicts a negative correlation between games played and record, this will be a metter we look into
+      If a player has the same stats as another player with less games played, the player with less games played will be counted as better. This is to say, if you don't scale stats with the games played the record will be worse as games played increases
       </p>
       <div>
         <a href="https://github.com/Pixelgost/FastBreak" target="_blank" rel="noopener noreferrer" className="github-button">
