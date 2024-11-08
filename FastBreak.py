@@ -811,7 +811,6 @@ class Performer():
             if (p.team not in self.nba_team_arrs):
                 self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / self.nba_games_played[self.nba_team_dict[p.team]]], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
-                print(self.nba_games_played)
                 self.nba_team_arrs[p.team].append(np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / self.nba_games_played[self.nba_team_dict[p.team]]], dtype=np.float32))
         # Forward pass
         for a in self.nba_team_arrs:
@@ -825,7 +824,6 @@ class Performer():
             if (key == 'CHA' and int(self.year) <= 2014):
                 key = 'CHA2005'
             # Compute loss
-            print(self.nba_team_dict[i], output.detach().numpy()[0][0], self.nba_team_wins[self.nba_team_dict[key]])
             data = {
                 "team": self.nba_team_dict[key],
                 "predicted_win_rate": str(round(output.detach().numpy()[0][0], 3)),
@@ -905,6 +903,6 @@ teams = []
 for i in range(2020, end_year):
     perf = Performer(str(i))
     teams.extend(perf.getYearPreds())
-with open("./fast-break/public/pteams.json", "w") as f:
+with open("./fast-break/public/teams.json", "w") as f:
     json.dump(teams, f)
 
