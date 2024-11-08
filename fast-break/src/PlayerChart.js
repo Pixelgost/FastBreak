@@ -7,7 +7,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const ScoreChart = ({ players }) => {
   // Prepare data for the chart with each metric as a separate dataset
   const data = {
-    labels: players.map(player => player.year), // years on x-axis
+    labels: players.map(player => `${parseInt(player.year)-1}-${player.year.slice(-2)}`), // years on x-axis
     datasets: [
       {
         label: 'VORP',
