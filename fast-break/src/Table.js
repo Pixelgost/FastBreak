@@ -92,7 +92,7 @@ const Table = ({ data, playerList }) => {
             },
           }}
         >
-          <button onClick={closeModal}>Close</button>
+          <button onClick={closeModal}>&times;</button>
           <h2>{selectedPlayer?.name}'s Performance</h2>
           {selectedPlayer && (
             <ScoreChart className="player-button" players={playerList.filter(p => p.name === selectedPlayer.name)} />

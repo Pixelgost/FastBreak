@@ -117,7 +117,7 @@ const TeamTable = ({ data, playerList }) => {
         },
       }}
     >
-      <button className="button-close" onClick={closeModal}>
+      <button onClick={closeModal}>
         &times;
       </button>
       <h2 className="modal-header">{selectedTeam?.team}'s Predictor</h2>
