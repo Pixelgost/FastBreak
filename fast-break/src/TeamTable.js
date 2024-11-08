@@ -15,7 +15,7 @@ const TeamTable = ({ data, playerList }) => {
   const [originalPlayerStats, setOriginalPlayerStats] = useState([])
   const [model, setModel] = useState(null);
   const [hideSliders, setHideSliders] = useState(true); // State for checkbox
-  
+  const scalingEffect = 1.5
   useEffect(() => {
     const loadModel = async () => {
       try {
@@ -70,10 +70,10 @@ const TeamTable = ({ data, playerList }) => {
     updatedStats[index].games_played = newGamesPlayed;
     setPlayerStats(updatedStats);
     if (hideSliders) {
-      updatedStats[index].scoring = originalPlayerStats[index].scoring * (scalingFactor * 0.6);
-      updatedStats[index].playmaking = originalPlayerStats[index].playmaking * (scalingFactor * 0.6);
-      updatedStats[index].defense = originalPlayerStats[index].defense * (scalingFactor * 0.6);
-      updatedStats[index].rebounding = originalPlayerStats[index].rebounding * (scalingFactor * 0.6);
+      updatedStats[index].scoring = originalPlayerStats[index].scoring * (scalingFactor * scalingEffect);
+      updatedStats[index].playmaking = originalPlayerStats[index].playmaking * (scalingFactor * scalingEffect);
+      updatedStats[index].defense = originalPlayerStats[index].defense * (scalingFactor * scalingEffect);
+      updatedStats[index].rebounding = originalPlayerStats[index].rebounding * (scalingFactor * scalingEffect);
       updatedStats[index].games_played = newGamesPlayed;
     }
     
