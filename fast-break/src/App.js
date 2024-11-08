@@ -83,6 +83,8 @@ const App = () => {
       <p className="Tex">
       You can try and predict a team's record by clicking on their name and adjusting their player's stats. 
       Keep in mind that games played is out of 82 so if we are only halfway through the season, adjust the games played to be all the way through.
+      </p>
+      <p>
       Also since volume affects a player's score for all stats, if you want to increase a player's games_played also increase their stats to reflect it. A good rule of thumb is 60% of the increase in the games played translates to increase in stats
       Example: If you want to increase Joel Embiid's games played by doubling it, increase his stats by 60% as well. If you just increase his stats by 1/3, increase his stats by 20%.
       </p>
