@@ -8,7 +8,8 @@ const App = () => {
   const [data, setData] = useState([]);
   const [teams, setTeams] = useState([]);
   const [year, setYear] = useState("2024");
-  
+  const [searchQuery, setSearchQuery] = useState("");  // New state for search query
+
   useEffect(() => {
     // Fetch data from local file
     fetch('/players.json')
@@ -40,7 +41,7 @@ const App = () => {
   if (prefilteredData.length > 1000){
     prefilteredData = prefilteredData.slice(0, 1000)
   }
-  const filteredData = prefilteredData
+  const filteredData = prefilteredData.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase))
   const filteredTeams = teams.filter(item => item.year === year);
 
   return (
@@ -50,6 +51,13 @@ const App = () => {
         options={yearOptions}
         onChange={handleYearChange}
         defaultValue={yearOptions.find(option => option.value === year)}
+      />
+      <input
+        type="text"
+        placeholder="Search by name"
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+        className="search-bar"  // Optional: Add a CSS class for styling
       />
       <Table data={filteredData} />
       <TeamTable data={filteredTeams} />
