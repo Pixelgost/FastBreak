@@ -85,8 +85,7 @@ const App = () => {
       Keep in mind that games played is out of 82 so if we are only halfway through the season, adjust the games played to be all the way through.
       </p>
       <p className='Tex'>
-      Also since volume affects a player's score for all stats, if you want to increase a player's games_played also increase their stats to reflect it. A good rule of thumb is 60% of the increase in the games played translates to increase in stats
-      Example: If you want to increase Joel Embiid's games played by doubling it, increase his stats by 60% as well. If you just increase his stats by 1/3, increase his stats by 20%.
+      Also since volume affects a player's score for all stats, if you want to increase a player's games played, use the auto-scale feature to also adjust the stats to be a good estimate.
       </p>
       <p className='Tex'>
       If a player has the same stats as another player with less games played, the player with less games played will be counted as better. This is to say, if you don't scale stats with the games played the record will be worse as games played increases
