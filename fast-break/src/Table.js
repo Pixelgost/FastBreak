@@ -1,11 +1,26 @@
 import React, { useState } from 'react';
 import './Table.css';  // Add custom styles here
 import { Tooltip} from 'react-tooltip';
+import Modal from 'react-modal';
+import ScoreChart from './PlayerChart';
 
+Modal.setAppElement('#root');
 
-const Table = ({ data }) => {
+const Table = ({ data, playerList }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'team', direction: 'ascending' });
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
+
+  const openModal = (player) => {
+    setSelectedPlayer(player);
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setSelectedPlayer(null);
+  };
   const sortedData = [...data].sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -45,7 +60,9 @@ const Table = ({ data }) => {
             {sortedData.map((row, index) => (
             <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{row.name}</td>
+                <td>
+                  <button className="player-button" onClick={() => openModal(row)}>{row.name}</button>
+                </td>
                 <td>{row.team}</td>
                 {yearSet.size > 1 && <td>{row.year}</td>}
                 <td>{row.scoring}</td>
@@ -58,7 +75,29 @@ const Table = ({ data }) => {
         </tbody>
         </table>
         <Tooltip id="my-tooltip" />
-
+        <Modal
+          isOpen={isOpen}
+          onRequestClose={closeModal}
+          contentLabel="Player Chart"
+          style={{
+            content: {
+              top: '50%',
+              left: '50%',
+              right: 'auto',
+              bottom: 'auto',
+              width: '50%',
+              height: '50%',
+              marginRight: '-50%',
+              transform: 'translate(-50%, -50%)',
+            },
+          }}
+        >
+          <h2>{selectedPlayer?.name}'s Performance</h2>
+          <button onClick={closeModal}>Close</button>
+          {selectedPlayer && (
+            <ScoreChart className="player-button" players={playerList.filter(p => p.name === selectedPlayer.name)} />
+          )}
+      </Modal>
     </div>
   );
 };

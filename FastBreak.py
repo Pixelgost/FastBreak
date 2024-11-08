@@ -2,9 +2,12 @@ from urllib.request import urlopen
 import numpy as np
 import re
 import torch
+import torch.onnx
+import onnx
 import torch.nn as nn
 import torch.optim as optim
 import optuna
+
 import random
 from pathlib import Path
 from sklearn.datasets import make_classification
@@ -836,6 +839,15 @@ class Performer():
                 "year": str(self.year)
             }
             data_arr.append(data)
+        dummy_input = torch.randn(1, 40)  # Adjust this to your model's input size
+        torch.onnx.export(
+            model, 
+            dummy_input, 
+            "./fast-break/public/model.onnx",
+            input_names=['input'], 
+            output_names=['output'],
+            dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
+        )
         return data_arr
     #train model for x epochs
     def trainForEpochs(epochs):
@@ -862,7 +874,6 @@ end_year = 2026
 player_data = []
 #for i in range(2025, 2026):
 #    statHandler.saveData(str(i))
-
 for i in range(start_year, end_year):
     s = statHandler(str(i))
     perf = Performer(str(i))
@@ -888,12 +899,12 @@ for i in range(start_year, end_year):
 
     if (progress % 5 == 0):
         print(f'{round(100 * (progress / (end_year - start_year)), 3)}% complete...')
-with open("players.json", "w") as f:
+with open("./fast-break/public/players.json", "w") as f:
     json.dump(player_data, f)
 teams = []
 for i in range(2020, end_year):
     perf = Performer(str(i))
     teams.extend(perf.getYearPreds())
-with open("teams.json", "w") as f:
+with open("./fast-break/public/pteams.json", "w") as f:
     json.dump(teams, f)
 

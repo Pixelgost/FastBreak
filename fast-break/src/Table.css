@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap');
 
+body {
+  font-family: 'Exo 2', sans-serif;
+}
+
 .table-container {
   max-height: 600px; /* Adjust based on your design */
   overflow-y: auto; /* Enable vertical scrolling */
@@ -59,6 +63,34 @@
 .table tbody tr:nth-child(even) {
   background-color: #f2f2f2; /* Light gray background for even rows */
 }
+
+.player-button {
+  font-family: 'Exo 2', sans-serif;  /* Ensure it uses the same font */
+  padding: 12px 15px;               /* Match table cell padding */
+  font-size: 14px;                  /* Adjust the font size to match table text */
+  color: #333;                      /* Text color to match table's default */
+  background-color: #ffffff;        /* White background, matching the table's default */
+  border: 1px solid #ddd;           /* Light border to match table cells */
+  border-radius: 5px;               /* Rounded corners to match the table */
+  cursor: pointer;                 /* Change cursor to pointer on hover */
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;  /* Smooth transition effects */
+}
+
+label {
+  font-weight: bold;
+}
+
+.player-button:hover {
+  background-color: #ffebee;        /* Light red background on hover, matching table row hover */
+  box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2);  /* Red glow effect on hover, same as table cell hover */
+  transform: scale(1.05);            /* Slightly scale up on hover, similar to table row hover */
+}
+
+.player-button:focus {
+  outline: none;                    /* Remove default focus outline */
+  border-color: #003f6c;             /* Change border color to match table header color */
+}
+
 
 .table tbody tr:hover {
   background-color: #ffebee; /* Light red background on hover */

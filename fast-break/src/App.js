@@ -59,8 +59,8 @@ const App = () => {
         onChange={e => setSearchQuery(e.target.value)}
         className="search-bar"  // Optional: Add a CSS class for styling
       />
-      <Table data={filteredData} />
-      <TeamTable data={filteredTeams} />
+      <Table data={filteredData} playerList={data} />
+      <TeamTable data={filteredTeams} playerList={filteredData} />
       <p className="Tex">FastBreak is a statistical analysis tool that ranks players and teams based on their attributes.
       There are four major attributes to a player's prowess: playmaking, rebounding, scoring, and defense.</p>
       <p className="Tex">
