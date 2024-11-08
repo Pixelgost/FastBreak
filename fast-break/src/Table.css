@@ -47,6 +47,24 @@ body {
   transition: border-top-color 0.3s;
 }
 
+.button-close, .button-submit {
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .button-close {
+    background-color: #ff4c4c;
+  }
+  
+  .button-close:hover {
+    background-color: #e03a3a;
+  }
+
 .table thead th.sorted-ascending::after {
   border-top-color: #ddd;
 }
@@ -114,3 +132,5 @@ label {
   background-color: #ffebee; /* Light red background on hover */
   box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2); /* Red glow effect on hover */
 }
+
+

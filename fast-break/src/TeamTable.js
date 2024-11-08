@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Table.css';  // Add custom styles here
 import { Tooltip } from 'react-tooltip';
 import Modal from 'react-modal';
+import './styles.css'
 import * as ort from 'onnxruntime-web';
 
 Modal.setAppElement('#root');
@@ -97,120 +98,144 @@ const TeamTable = ({ data, playerList }) => {
       </div>
     }
     <Modal
-          isOpen={isOpen}
-          onRequestClose={closeModal}
-          contentLabel="Player Chart"
-          style={{
-            content: {
-              top: '50%',
-              left: '50%',
-              right: 'auto',
-              bottom: 'auto',
-              width: '80%',
-              height: '80%',
-              marginRight: '-50%',
-              transform: 'translate(-50%, -50%)',
-            },
-          }}
-        >
-          <h2>{selectedTeam?.team}'s Predictor</h2>
-          <button onClick={closeModal}>Close</button>
-          {playerStats && playerStats.length > 0 && playerStats.map((player, index) => {
-              return(
-              <div key={index}>
-                <p>{player.name}</p>
-                <label>Playmaking: {playerStats[index].playmaking}</label>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  step={0.2}
-                  value={playerStats[index].playmaking}
-                  onChange={(e) => { 
-                    const arr = [...playerStats]
-                    arr[index].playmaking = parseFloat(e.target.value);
-                    setPlayerStats(arr)
-                  }}
-                />
-                <label>Scoring: {playerStats[index].scoring}</label>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  value={playerStats[index].scoring}
-                  onChange={(e) => { 
-                    const arr = [...playerStats]
-                    arr[index].scoring = parseFloat(e.target.value);
-                    setPlayerStats(arr)
-                  }}
-                />
-                <label>Rebounding: {playerStats[index].rebounding}</label>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  value={playerStats[index].rebounding}
-                  onChange={(e) => { 
-                    const arr = [...playerStats]
-                    arr[index].rebounding = parseFloat(e.target.value);
-                    setPlayerStats(arr)
-                  }}
-                />
-                <label>Defense: {playerStats[index].defense}</label>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  value={playerStats[index].defense}
-                  onChange={(e) => { 
-                    const arr = [...playerStats]
-                    arr[index].defense = parseFloat(e.target.value);
-                    setPlayerStats(arr)
-                  }}
-                />
-                <label>Games Played: {playerStats[index].games_played}</label>
-                <input
-                  type="range"
-                  min={0}
-                  max={82}
-                  value={playerStats[index].games_played}
-                  onChange={(e) => { 
-                    const arr = [...playerStats]
-                    arr[index].games_played = e.target.value;
-                    setPlayerStats(arr)
-                  }}
-                />
-              </div>
-              )
-          })}
-          <button className='player-button' onClick={async (e) => {
-            const data = [];
-            playerStats.forEach((item) => {
-              data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / 82.0))
-            })
-            console.log(data)
-            if (data.length === 40) {
-              const inputTensor = new ort.Tensor('float32', data, [1, data.length]); // Adjust dimensions as needed
-              const feeds = { input: inputTensor }; // Replace input_name with your model's input name
-              const output = await model.run(feeds);
-              if (output.output.cpuData.length > 0) {
-                const rate = output.output.cpuData[0]
-                const wins = Math.min(Math.round(82 * rate), 82)
-                const losses = 82 - wins
-                alert(`Predicted Record: ${wins} - ${losses}`)
-              } else {
-                alert("Internal Error!")
-              }
+      isOpen={isOpen}
+      onRequestClose={closeModal}
+      contentLabel="Player Chart"
+      style={{
+        content: {
+          top: '50%',
+          left: '50%',
+          right: 'auto',
+          bottom: 'auto',
+          width: '60%',
+          height: '80%',
+          marginRight: '-50%',
+          transform: 'translate(-50%, -50%)',
+        },
+        overlay: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay
+        },
+      }}
+    >
+      <button className="button-close" onClick={closeModal}>
+        &times;
+      </button>
+      <h2 className="modal-header">{selectedTeam?.team}'s Predictor</h2>
+      
+
+      {playerStats && playerStats.length > 0 && playerStats.map((player, index) => (
+        <div key={index} className="player-stats">
+          <h3>{player.name}</h3>
+          <div>
+            <label className="range-label">Playmaking: {playerStats[index].playmaking}</label>
+            <input
+              type="range"
+              min={0}
+              max={10}
+              step={0.2}
+              value={playerStats[index].playmaking}
+              onChange={(e) => {
+                const arr = [...playerStats];
+                arr[index].playmaking = parseFloat(e.target.value);
+                setPlayerStats(arr);
+              }}
+              className="range-input"
+            />
+          </div>
+          <div>
+            <label className="range-label">Scoring: {playerStats[index].scoring}</label>
+            <input
+              type="range"
+              min={0}
+              max={10}
+              step={0.5}
+              value={playerStats[index].scoring}
+              onChange={(e) => {
+                const arr = [...playerStats];
+                arr[index].scoring = parseFloat(e.target.value);
+                setPlayerStats(arr);
+              }}
+              className="range-input"
+            />
+          </div>
+          <div>
+            <label className="range-label">Rebounding: {playerStats[index].rebounding}</label>
+            <input
+              type="range"
+              min={0}
+              max={10}
+              step={0.5}
+              value={playerStats[index].rebounding}
+              onChange={(e) => {
+                const arr = [...playerStats];
+                arr[index].rebounding = parseFloat(e.target.value);
+                setPlayerStats(arr);
+              }}
+              className="range-input"
+            />
+          </div>
+          <div>
+            <label className="range-label">Defense: {playerStats[index].defense}</label>
+            <input
+              type="range"
+              min={0}
+              max={10}
+              step={0.5}
+              value={playerStats[index].defense}
+              onChange={(e) => {
+                const arr = [...playerStats];
+                arr[index].defense = parseFloat(e.target.value);
+                setPlayerStats(arr);
+              }}
+              className="range-input"
+            />
+          </div>
+          <div>
+            <label className="range-label">Games Played: {playerStats[index].games_played}</label>
+            <input
+              type="range"
+              min={0}
+              max={82}
+              value={playerStats[index].games_played}
+              onChange={(e) => {
+                const arr = [...playerStats];
+                arr[index].games_played = e.target.value;
+                setPlayerStats(arr);
+              }}
+              className="range-input"
+            />
+          </div>
+        </div>
+      ))}
+
+      <button
+        className="button-submit"
+        onClick={async (e) => {
+          const data = [];
+          playerStats.forEach((item) => {
+            data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / 82.0));
+          });
+          console.log(data);
+          if (data.length === 40) {
+            const inputTensor = new ort.Tensor('float32', data, [1, data.length]);
+            const feeds = { input: inputTensor };
+            const output = await model.run(feeds);
+            if (output.output.cpuData.length > 0) {
+              const rate = output.output.cpuData[0];
+              const wins = Math.max(Math.min(Math.round(82 * rate), 82), 0);
+              const losses = 82 - wins;
+              alert(`Predicted Record: ${wins} - ${losses}`);
             } else {
-              alert("Not Enough Data!")
+              alert("Internal Error!");
             }
-          }}>
-            Submit
-          </button>
-      </Modal>
+          } else {
+            alert("Not Enough Data!");
+          }
+        }}
+      >
+        Submit
+      </button>
+    </Modal>
   </div>
   );
 };

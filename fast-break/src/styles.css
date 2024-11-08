@@ -1,0 +1,73 @@
+/* Modal Styling */
+.modal-content {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: 60%;
+    height: 80%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    background-color: #2f2f2f;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    color: #fff;
+  }
+  
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Heading */
+  .modal-header {
+    color: #ff4c4c;
+  }
+  
+  /* Buttons */
+  .button-close, .button-submit {
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .button-close {
+    background-color: #ff4c4c;
+  }
+  
+  .button-close:hover {
+    background-color: #e03a3a;
+  }
+  
+  .button-submit {
+    background-color: #007bff;
+    padding: 12px 24px;
+    font-size: 18px;
+  }
+  
+  .button-submit:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Player Stats Form */
+  .player-stats {
+    margin-bottom: 20px;
+  }
+  
+  .player-stats h3 {
+    color: black; /* Set player name text color to black */
+  }
+  
+  .range-label {
+    margin-right: 10px;
+  }
+  
+  .range-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
