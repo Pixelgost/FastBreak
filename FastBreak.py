@@ -7,7 +7,8 @@ import onnx
 import torch.nn as nn
 import torch.optim as optim
 import optuna
-
+import certifi
+import ssl
 import random
 from pathlib import Path
 from sklearn.datasets import make_classification
@@ -433,19 +434,20 @@ class statHandler():
 
     #save the data by pulling it from the web
     def saveData(year):
-        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_advanced.html")
+        context = ssl.create_default_context(cafile=certifi.where())
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_advanced.html", context=context)
         html_content = response.read()
         with open(year+"advanced.html", 'wb') as file:
             file.write(html_content)
-        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_ratings.html")
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_ratings.html", context=context)
         html_content = response.read()
         with open(year+"teams.html", 'wb') as file:
             file.write(html_content)
-        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_adj_shooting.html")
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_adj_shooting.html", context=context)
         html_content = response.read()
         with open(year+"shooting.html", 'wb') as file:
             file.write(html_content)
-        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_totals.html")
+        response = urlopen( "https://www.basketball-reference.com/leagues/NBA_"+ year +"_totals.html", context=context)
         html_content = response.read()
         with open(year+"total.html", 'wb') as file:
             file.write(html_content)
@@ -870,8 +872,8 @@ progress = 0
 start_year = 1980
 end_year = 2026
 player_data = []
-#for i in range(2025, 2026):
-#    statHandler.saveData(str(i))
+for i in range(2025, 2026):
+    statHandler.saveData(str(i))
 for i in range(start_year, end_year):
     s = statHandler(str(i))
     perf = Performer(str(i))
@@ -896,7 +898,7 @@ for i in range(start_year, end_year):
     progress += 1.0
 
     if (progress % 5 == 0):
-        print(f'{round(100 * (progress / (end_year - start_year)), 3)}% complete...')
+        print(f'{round(100 * (progress / (end_year - start_year)), 2)}% complete...')
 with open("./fast-break/public/players.json", "w") as f:
     json.dump(player_data, f)
 teams = []
