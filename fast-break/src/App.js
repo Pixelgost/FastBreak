@@ -7,7 +7,7 @@ import TeamTable from './TeamTable';
 const App = () => {
   const [data, setData] = useState([]);
   const [teams, setTeams] = useState([]);
-  const [year, setYear] = useState("2024");
+  const [year, setYear] = useState("2025");
   const [searchQuery, setSearchQuery] = useState("");  // New state for search query
 
   useEffect(() => {
