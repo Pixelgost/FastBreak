@@ -30,8 +30,6 @@ const TeamTable = ({ data, playerList }) => {
 
   const openModal = (team) => {
     setSelectedTeam(team);
-    console.log(team.actual_wins + team.actual_losses)
-    console.log(team)
     setPlayerStats(playerList.filter((player) => player.team === team.team).sort((a, b) => b.n_vorp - a.n_vorp).slice(0, 8))
     setOriginalPlayerStats(JSON.parse(JSON.stringify(playerList.filter((player) => player.team === team.team).sort((a, b) => b.n_vorp - a.n_vorp).slice(0, 8))))
     setIsOpen(true);
@@ -237,7 +235,7 @@ const TeamTable = ({ data, playerList }) => {
               <input
                 type="range"
                 min={1}
-                max={selectedTeam.actual_wins + selectedTeam.actual_losses}
+                max={parseInt(selectedTeam.actual_wins) + parseInt(selectedTeam.actual_losses)}
                 value={playerStats[index].games_played}
                 onChange={(e) => handleGamesPlayedChange(e, index)}
                 className="range-input"
@@ -251,7 +249,7 @@ const TeamTable = ({ data, playerList }) => {
           onClick={async (e) => {
             const data = [];
             playerStats.forEach((item) => {
-              data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / (selectedTeam.actual_wins + selectedTeam.actual_losses)));
+              data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / (parseInt(selectedTeam.actual_wins) + parseInt(selectedTeam.actual_losses))));
             });
             console.log(data);
             if (data.length === 40) {
