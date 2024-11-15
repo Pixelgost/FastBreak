@@ -235,7 +235,7 @@ const TeamTable = ({ data, playerList }) => {
               <input
                 type="range"
                 min={1}
-                max={82}
+                max={selectedTeam.actual_wins + selectedTeam.actual_losses }
                 value={playerStats[index].games_played}
                 onChange={(e) => handleGamesPlayedChange(e, index)}
                 className="range-input"
