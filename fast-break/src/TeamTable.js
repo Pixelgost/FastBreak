@@ -30,7 +30,8 @@ const TeamTable = ({ data, playerList }) => {
 
   const openModal = (team) => {
     setSelectedTeam(team);
-    console.log(selectedTeam.actual_wins + selectedTeam.actual_losse)
+    console.log(selectedTeam.actual_wins + selectedTeam.actual_losses)
+    console.log(team)
     setPlayerStats(playerList.filter((player) => player.team === team.team).sort((a, b) => b.n_vorp - a.n_vorp).slice(0, 8))
     setOriginalPlayerStats(JSON.parse(JSON.stringify(playerList.filter((player) => player.team === team.team).sort((a, b) => b.n_vorp - a.n_vorp).slice(0, 8))))
     setIsOpen(true);
