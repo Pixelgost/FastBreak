@@ -30,7 +30,7 @@ const TeamTable = ({ data, playerList }) => {
 
   const openModal = (team) => {
     setSelectedTeam(team);
-    console.log(team)
+    console.log(selectedTeam.actual_wins + selectedTeam.actual_losse)
     setPlayerStats(playerList.filter((player) => player.team === team.team).sort((a, b) => b.n_vorp - a.n_vorp).slice(0, 8))
     setOriginalPlayerStats(JSON.parse(JSON.stringify(playerList.filter((player) => player.team === team.team).sort((a, b) => b.n_vorp - a.n_vorp).slice(0, 8))))
     setIsOpen(true);
@@ -85,7 +85,7 @@ const TeamTable = ({ data, playerList }) => {
   return (
     <div>
       {shouldShowTable &&
-        <div className="table-container">4
+        <div className="table-container">
           <table className="table">
             <thead>
               <tr>
@@ -236,7 +236,7 @@ const TeamTable = ({ data, playerList }) => {
               <input
                 type="range"
                 min={1}
-                max={selectedTeam.actual_wins + selectedTeam.actual_losses }
+                max={selectedTeam.actual_wins + selectedTeam.actual_losses}
                 value={playerStats[index].games_played}
                 onChange={(e) => handleGamesPlayedChange(e, index)}
                 className="range-input"
