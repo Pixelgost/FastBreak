@@ -4,6 +4,7 @@ import { Tooltip } from 'react-tooltip';
 import Modal from 'react-modal';
 import './styles.css';
 import * as ort from 'onnxruntime-web';
+import { games } from 'googleapis/build/src/apis/games';
 
 Modal.setAppElement('#root');
 
@@ -248,8 +249,9 @@ const TeamTable = ({ data, playerList }) => {
           className="button-submit"
           onClick={async (e) => {
             const data = [];
+            const games = parseInt(selectedTeam.actual_wins) + parseInt(selectedTeam.actual_losses)
             playerStats.forEach((item) => {
-              data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / (parseInt(selectedTeam.actual_wins) + parseInt(selectedTeam.actual_losses))));
+              data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / games));
             });
             console.log(data);
             if (data.length === 40) {
@@ -258,9 +260,11 @@ const TeamTable = ({ data, playerList }) => {
               const output = await model.run(feeds);
               if (output.output.cpuData.length > 0) {
                 const rate = output.output.cpuData[0];
-                const wins = Math.max(Math.min(Math.round(82 * rate), 82), 0);
-                const losses = 82 - wins;
-                alert(`Predicted Record: ${wins} - ${losses}`);
+                const seaon_end_wins = Math.max(Math.min(Math.round(82 * rate), 82), 0);
+                const season_end_losses = 82 - wins;
+                const wins = Math.max(Math.min(Math.round(games * rate), games), 0); 
+                const losses = games - wins
+                alert(`Predicted Record (End Of Season): ${seaon_end_wins} - ${season_end_losses}\nPredicted Record: ${wins} - ${losses}`);
               } else {
                 alert("Internal Error!");
               }
