@@ -249,7 +249,7 @@ const TeamTable = ({ data, playerList }) => {
           onClick={async (e) => {
             const data = [];
             playerStats.forEach((item) => {
-              data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / 82.0));
+              data.push(item.scoring, item.playmaking, item.rebounding, item.defense, (parseInt(item.games_played) / (selectedTeam.actual_wins + selectedTeam.actual_losses)));
             });
             console.log(data);
             if (data.length === 40) {
