@@ -66,10 +66,10 @@ const Table = ({ data, playerList }) => {
                 <td>{row.team}</td>
                 {yearSet.size > 1 && <td>{row.year}</td>}
                 <td>{row.scoring}</td>
-                <td>{row.playmaking}</td>
+                <td>{row.playmaking > -1000 ? row.playmaking : 'NaN'}</td>
                 <td>{row.rebounding}</td>
                 <td>{row.defense}</td>
-                <td>{row.n_vorp}</td>
+                <td>{row.n_vorp > -1000 ? row.playmaking : 'NaN'}</td>
             </tr>
             ))}
         </tbody>
