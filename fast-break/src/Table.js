@@ -69,7 +69,7 @@ const Table = ({ data, playerList }) => {
                 <td>{row.playmaking > -1000 ? row.playmaking : 'NaN'}</td>
                 <td>{row.rebounding}</td>
                 <td>{row.defense}</td>
-                <td>{row.n_vorp > -1000 ? row.playmaking : 'NaN'}</td>
+                <td>{row.n_vorp > -1000 ? row.n_vorp : 'NaN'}</td>
             </tr>
             ))}
         </tbody>
