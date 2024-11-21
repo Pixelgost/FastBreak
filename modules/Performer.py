@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 import optuna
 import certifi
+import math
 import ssl
 import random
 from pathlib import Path
@@ -111,6 +112,8 @@ class Performer():
 
         example_input = {}
         for p in players:
+            if(p.team == "Multiple Teams"):
+                continue
             if (p.team not in self.nba_team_arrs):
                 self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / self.nba_games_played[self.nba_team_dict[p.team]]], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
@@ -162,6 +165,8 @@ class Performer():
 
         example_input = {}
         for p in players:
+            if(p.team == "Multiple Teams"):
+                continue
             if (p.team not in self.nba_team_arrs):
                 self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / self.nba_games_played[self.nba_team_dict[p.team]]], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
@@ -204,6 +209,8 @@ class Performer():
         #set up example input
         example_input = {}
         for p in players:
+            if(p.team == "Multiple Teams"):
+                continue
             if (p.team not in self.nba_team_arrs):
                 self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / self.nba_games_played[self.nba_team_dict[p.team]]], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
@@ -243,6 +250,8 @@ class Performer():
         #set up example input
         example_input = {}
         for p in players:
+            if(p.team == "Multiple Teams"):
+                continue
             if (p.team not in self.nba_team_arrs):
                 self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / self.nba_games_played[self.nba_team_dict[p.team]]], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):
@@ -334,6 +343,8 @@ class Performer():
         #set up example input
         example_input = {}
         for p in players:
+            if(p.team == "Multiple Teams"):
+                continue
             if (p.team not in self.nba_team_arrs):
                 self.nba_team_arrs[p.team] = [np.array([p.scoring, p.playmaking, p.rebounding, p.defensive_win_share_normalized, int(p.games_played) / self.nba_games_played[self.nba_team_dict[p.team]]], dtype=np.float32)]
             elif(len(self.nba_team_arrs[p.team]) < 8):

@@ -47,9 +47,12 @@ for i in range(start_year, end_year):
         key = p.team
         if (key == 'CHA' and i <= 2014):
                 key = 'CHA2005'
+        team = key
+        if (team != "Multiple Teams"):
+            team = perf.nba_team_dict[key]
         data = {
             "name": p.name,
-            "team": perf.nba_team_dict[key],
+            "team": team,
             "scoring": round(p.scoring, 4),
             "playmaking": round(p.playmaking, 4),
             "rebounding": round(p.rebounding, 4),
@@ -67,7 +70,7 @@ for i in range(start_year, end_year):
 with open("./fast-break/public/players.json", "w") as f:
     json.dump(player_data, f)
 teams = []
-for i in range(2020, end_year):
+for i in range(2016, end_year):
     perf = Performer(str(i))
     teams.extend(perf.getYearPreds())
 with open("./fast-break/public/teams.json", "w") as f:

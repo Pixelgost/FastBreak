@@ -47,8 +47,10 @@ class StatHandler():
                         stat_list[i] = None
                     elif stat_list[i][len(stat_list[i]) - 1] == '*':
                         stat_list[i] = stat_list[i][:len(stat_list[i])-1]
-                if (stat_list[2] == None or stat_list[2][1:] == 'TM'):
+                if (stat_list[2] == None):
                     continue
+                if (stat_list[2][1:] == 'TM'):
+                    stat_list[2] = "Multiple Teams"
                 self.players.append(PlayerStats(id_counter, stat_list[0], stat_list[1], stat_list[2], stat_list[3], stat_list[4], stat_list[5], stat_list[6], stat_list[7], stat_list[8], 
                                         stat_list[9], stat_list[10], stat_list[11], stat_list[12], stat_list[13], stat_list[14], stat_list[15], 
                                             stat_list[16], stat_list[17], stat_list[18], stat_list[19], stat_list[20], stat_list[21], stat_list[22], stat_list[23], stat_list[24], 
@@ -61,7 +63,13 @@ class StatHandler():
         html = re.sub("<!--\n", "\n", html)
         soup = BeautifulSoup(html,"html.parser")
         table = soup.find("table", id="adj-shooting")
-        for row in table.find_all("tr"):
+        if table == None:
+            table = soup.find("table", id="adj_shooting")
+        team_index = 3
+        if (self.year == '2025'):
+            team_index = 2
+        rows = table.find_all("tr")
+        for row in rows:
             # Get each cell in the row
             cells = row.find_all("td")
             # If there are cells (to skip header rows, etc.)
@@ -73,18 +81,24 @@ class StatHandler():
                         stat_list[i] = None
                     elif stat_list[i][len(stat_list[i]) - 1] == '*':
                         stat_list[i] = stat_list[i][:len(stat_list[i])-1]
-                if (stat_list[3] == None or stat_list[3][1:] == 'TM'):
+                if (stat_list[team_index] == None):
                     continue
+                if (stat_list[team_index][1:] == 'TM'):
+                    stat_list[team_index] == 'Multiple Teams'
                 for p in self.players:
-                        if(p.name == stat_list[0] and p.team == stat_list[3]):
-                            p.fg_add = stat_list[len(stat_list) - 2]
-                            p.ts_add = stat_list[len(stat_list) - 1]
+                        if(p.name == stat_list[0] and p.team == stat_list[team_index]):
+                            p.fg_add = stat_list[len(stat_list) - 3]
+                            p.ts_add = stat_list[len(stat_list) - 2]
+        
         #get advanced stats
         html = open("./year_stats/" + self.year+"advanced.html", "r").read()
         soup = BeautifulSoup(html,"html.parser")
         table = soup.find("table", id="advanced_stats")
+        if not table:
+            table = soup.find("table", id="advanced")
+        rows = table.find_all("tr")
         id_counter = 0
-        for row in table.find_all("tr"):
+        for row in rows:
             # Get each cell in the row
             cells = row.find_all("td")
             # If there are cells (to skip header rows, etc.)
@@ -96,19 +110,21 @@ class StatHandler():
                         stat_list[i] = None
                     elif stat_list[i][len(stat_list[i]) - 1] == '*':
                         stat_list[i] = stat_list[i][:len(stat_list[i])-1]
-                if (stat_list[3] == None or stat_list[3][1:] == 'TM'):
+                if (stat_list[team_index] == None):
                     continue
+                if (stat_list[team_index] == None):
+                    stat_list[team_index] = "Multiple Teams"
                 for p in self.players:
-                        if(p.name == stat_list[0] and p.team == stat_list[3]):
-                            p.rebound_rate = stat_list[12]
-                            p.assist_rate = stat_list[13]
-                            p.steal_rate = stat_list[14]
-                            p.block_rate = stat_list[15]
-                            p.turnover_rate = stat_list[16]
-                            p.usage_percentage = stat_list[17]
-                            p.defensive_win_shares = stat_list[20]
-                            p.win_shares = stat_list[21]
-                            p.defensive_plus_minus = stat_list[25]
+                        if(p.name == stat_list[0] and p.team == stat_list[team_index]):
+                            p.rebound_rate = stat_list[12 + 3 - team_index]
+                            p.assist_rate = stat_list[13 + 3 - team_index]
+                            p.steal_rate = stat_list[14 + 3 - team_index]
+                            p.block_rate = stat_list[15 + 3 - team_index]
+                            p.turnover_rate = stat_list[16 + 3 - team_index]
+                            p.usage_percentage = stat_list[17 + 3 - team_index]
+                            p.defensive_win_shares = stat_list[20 + 3 - team_index]
+                            p.win_shares = stat_list[21 + 3 - team_index]
+                            p.defensive_plus_minus = stat_list[25 + 3 - team_index]
         
         return self.players
 
