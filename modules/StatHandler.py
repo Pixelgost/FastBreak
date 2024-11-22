@@ -49,7 +49,7 @@ class StatHandler():
                         stat_list[i] = stat_list[i][:len(stat_list[i])-1]
                 if (stat_list[2] == None):
                     continue
-                if (stat_list[2][1:] == 'TM'):
+                if (stat_list[2][1:] == "TM" or stat_list[2] == "TOT"):
                     stat_list[2] = "Multiple Teams"
                 self.players.append(PlayerStats(id_counter, stat_list[0], stat_list[1], stat_list[2], stat_list[3], stat_list[4], stat_list[5], stat_list[6], stat_list[7], stat_list[8], 
                                         stat_list[9], stat_list[10], stat_list[11], stat_list[12], stat_list[13], stat_list[14], stat_list[15], 
@@ -83,7 +83,7 @@ class StatHandler():
                         stat_list[i] = stat_list[i][:len(stat_list[i])-1]
                 if (stat_list[team_index] == None):
                     continue
-                if (stat_list[team_index][1:] == 'TM'):
+                if (stat_list[team_index][1:] == "TM" or stat_list[team_index] == "TOT"):
                     stat_list[team_index] == 'Multiple Teams'
                 for p in self.players:
                         if(p.name == stat_list[0] and p.team == stat_list[team_index]):
@@ -112,7 +112,7 @@ class StatHandler():
                         stat_list[i] = stat_list[i][:len(stat_list[i])-1]
                 if (stat_list[team_index] == None):
                     continue
-                if (stat_list[team_index] == None):
+                if (stat_list[team_index][1:] == "TM" or stat_list[team_index] == "TOT"):
                     stat_list[team_index] = "Multiple Teams"
                 for p in self.players:
                         if(p.name == stat_list[0] and p.team == stat_list[team_index]):
