@@ -84,7 +84,7 @@ class StatHandler():
                 if (stat_list[team_index] == None):
                     continue
                 if (stat_list[team_index][1:] == "TM" or stat_list[team_index] == "TOT"):
-                    stat_list[team_index] == 'Multiple Teams'
+                    stat_list[team_index] = 'Multiple Teams'
                 for p in self.players:
                         if(p.name == stat_list[0] and p.team == stat_list[team_index]):
                             p.fg_add = stat_list[len(stat_list) - (2 + 3 - team_index)]
