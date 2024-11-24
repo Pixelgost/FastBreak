@@ -371,6 +371,7 @@ class Performer():
                 "predicted_losses": str(round(round((82 * (1 - output.detach().numpy()[0][0]))), 3)),
                 "actual_wins": str(self.nba_team_wins_count[self.nba_team_dict[key]]),
                 "actual_losses": str(self.nba_games_played[self.nba_team_dict[key]] - self.nba_team_wins_count[self.nba_team_dict[key]]),
+                "error": str(abs(round(output.detach().numpy()[0][0], 3) - round(self.nba_team_wins[self.nba_team_dict[key]], 3)) / round(self.nba_team_wins[self.nba_team_dict[key]], 3)),
                 "year": str(self.year)
             }
             data_arr.append(data)

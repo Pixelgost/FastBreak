@@ -96,6 +96,8 @@ const TeamTable = ({ data, playerList }) => {
                 <th onClick={() => requestSort('actual_loss_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual loss rate">Actual Loss Rate</th>
                 <th onClick={() => requestSort('predicted_wins')} data-tooltip-id="my-tooltip" data-tooltip-content=" Neural Network predicted record">Predicted Record</th>
                 <th onClick={() => requestSort('actual_win_rate')} data-tooltip-id="my-tooltip" data-tooltip-content="Actual Record of the Teams">Actual Record</th>
+                <th onClick={() => requestSort('error')} data-tooltip-id="my-tooltip" data-tooltip-content="Error between predicted win rate and actual win rate">Error</th>
+
               </tr>
             </thead>
             <tbody>
@@ -111,6 +113,7 @@ const TeamTable = ({ data, playerList }) => {
                   <td>{row.actual_loss_rate}</td>
                   <td>{`${row.predicted_wins} - ${row.predicted_losses}`}</td>
                   <td>{`${row.actual_wins} - ${row.actual_losses}`}</td>
+                  <td>{row.error}</td>
                 </tr>
               ))}
             </tbody>
