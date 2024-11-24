@@ -87,8 +87,8 @@ class StatHandler():
                     stat_list[team_index] == 'Multiple Teams'
                 for p in self.players:
                         if(p.name == stat_list[0] and p.team == stat_list[team_index]):
-                            p.fg_add = stat_list[len(stat_list) - 3]
-                            p.ts_add = stat_list[len(stat_list) - 2]
+                            p.fg_add = stat_list[len(stat_list) - (2 + 3 - team_index)]
+                            p.ts_add = stat_list[len(stat_list) - (1 + 3 - team_index)]
         
         #get advanced stats
         html = open("./year_stats/" + self.year+"advanced.html", "r").read()
