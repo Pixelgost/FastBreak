@@ -37,8 +37,8 @@ progress = 0
 start_year = 1980
 end_year = 2026
 player_data = []
-#for i in range(2025, 2026):
-#    StatHandler.saveData(str(i))
+for i in range(2025, 2026):
+    StatHandler.saveData(str(i))
 for i in range(start_year, end_year):
     s = StatHandler(str(i))
     perf = Performer(str(i))
