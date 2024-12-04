@@ -34,7 +34,7 @@ from Performer import Performer
 #p = Performer("2024")
 #p.showCase()
 progress = 0
-start_year = 1980
+start_year = 2024
 end_year = 2026
 player_data = []
 for i in range(2025, 2026):
